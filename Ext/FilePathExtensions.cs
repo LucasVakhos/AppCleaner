@@ -24,7 +24,7 @@ namespace AppCleaner
                 // читаем до 4 байт для BOM-детекции
                 var bom = new byte[4];
                 int read = fs.Read(bom, 0, bom.Length);
-                // BOM checks
+                // Проверки спецификации
                 if (read >= 4 && bom[0] == 0x00 && bom[1] == 0x00 && bom[2] == 0xFE && bom[3] == 0xFF)
                     return new UTF32Encoding(bigEndian: true, byteOrderMark: true);
                 if (read >= 4 && bom[0] == 0xFF && bom[1] == 0xFE && bom[2] == 0x00 && bom[3] == 0x00)

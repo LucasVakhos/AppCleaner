@@ -165,8 +165,10 @@ public partial class FileScanner : XtraUserControl
         {
             _todoItems.Add(item);
 
+            var attr = item.GetAttribute<ComboItemAttribute>();
+
             cboSelectToDo.Properties.Items.Add(
-                item.GetAttribute<DisplayAttribute>()?.Name ?? item.ToString());
+                attr?.Name ?? item.ToString());
         }
 
         SetSelectedTodoFromStore();
@@ -178,13 +180,11 @@ public partial class FileScanner : XtraUserControl
         {
             _netItems.Add(item);
 
-            cboNET.Properties.Items.Add(
-                item.GetAttribute<DisplayAttribute>()?.Name ?? item.ToString());
+            cboNET.Properties.Items.Add(GetDisplayName(item));
         }
 
         SetSelectedNetFromStore();
     }
-
     private void SetSelectedPatternFromStore()
     {
         _suppressPatternEditValueChanged = true;
@@ -368,22 +368,19 @@ public partial class FileScanner : XtraUserControl
     }
     private ComboToDoItems GetTodoBySelectedIndex()
     {
-        int index = cboSelectToDo.SelectedIndex;
-        return index >= 0 && index < _todoItems.Count
-            ? _todoItems[index]
-            : default;
+        var index = cboSelectToDo.SelectedIndex;
+
+        if (index < 0 || index >= _todoItems.Count)
+            return ComboToDoItems.DeleteEmpty;
+
+        return _todoItems[index];
     }
     private void SetSelectedTodoFromStore()
     {
-        var todo = Enum.IsDefined(typeof(ComboToDoItems), _store.SelectedActionIndex)
-            ? (ComboToDoItems)_store.SelectedActionIndex
-            : default;
-        int index = _todoItems.IndexOf(todo);
-        if (index < 0)
-            index = 0;
-        cboSelectToDo.SelectedIndex = index;
-        _todoType = GetTodoBySelectedIndex();
-        _store.SelectedActionIndex = (int)_todoType;
+        if (_store.SelectedActionIndex < 0 || _store.SelectedActionIndex >= _todoItems.Count)
+            _store.SelectedActionIndex = 0;
+
+        cboSelectToDo.SelectedIndex = _store.SelectedActionIndex;
     }
     private void LogOperationHeader()
     {
@@ -432,20 +429,30 @@ public partial class FileScanner : XtraUserControl
     }
 
     #region UpdatePathFilters
-
     private void cboSelectToDo_SelectedIndexChanged(object sender, EventArgs e)
     {
+        if (cboSelectToDo.SelectedIndex < 0 || cboSelectToDo.SelectedIndex >= _todoItems.Count)
+            return;
+
+        _store.SelectedActionIndex = cboSelectToDo.SelectedIndex;
+
         _todoType = GetTodoBySelectedIndex();
 
-        _store.SelectedActionIndex = (int)_todoType;
+        var attr = _todoType.GetAttribute<ComboItemAttribute>();
+
+        if (attr?.Pattern != null)
+        {
+            _store.SearchPattern = attr.Pattern.Value;
+            SetSelectedPatternFromStore();
+        }
 
         UpdatePathFilters(_todoType);
-
         SetupLayouts();
         SyncPathEditorFromStore();
-        _store.RefreshCommandStates();
-    }
 
+        _store.RefreshCommandStates();
+        RefreshUi();
+    }
     private void UpdatePathFilters(ComboToDoItems action)
     {
         FillCombo(cboSearchFolder, _store.GetPathes(action, true));
@@ -613,8 +620,8 @@ public partial class FileScanner : XtraUserControl
         bool isProjectMode = isFindAdd || isSync || isConvert;
 
         SetVisibility(lgFolders, isProcessFiles);
-        //SetVisibility(lgToDo, isFindReplace || isFindAdd || isConvert);
-        //SetVisibility(lgToDo, isFindReplace || isFindAdd || isConvert);
+        //Установите видимость(lgToDo, isFindReplace || isFindAdd || isConvert);
+        //Установите видимость(lgToDo, isFindReplace || isFindAdd || isConvert);
 
         SetVisibility(lgOptions, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
         

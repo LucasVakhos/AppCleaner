@@ -76,7 +76,7 @@ namespace AppCleaner
             )]
         RestoreMissingUsings,
         [ComboItem(
-            Name = "Добавить комментарий /*Path File*/ к файлам .сs в папке...", 
+            Name = "Добавить комментарий /*Путь к файлу*/ к файлам .сs в папке...", 
             OperationTypes = OperationTypes.ProcessFiles
             )]
         AddFilePathCommentToCsFiles

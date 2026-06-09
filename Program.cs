@@ -5,7 +5,7 @@ namespace AppCleaner;
 static class Program
 {
     /// <summary>
-    /// The main entry point for the application.
+    /// Основная точка входа в приложение.
     /// </summary>
     [STAThread]
     static void Main()
@@ -51,10 +51,10 @@ static class Program
 
         // Настройка конфигурации приложения
 
-        //Enables trace source. Remove the following line in the Release version of the project.
+        //Позволяет отслеживать источник. Удалите следующую строку в релизной версии проекта.
         DevExpress.Utils.Localization.XtraLocalizer.EnableTraceSource();
 
-        //Uncomment the following line in a Release version.
+        //Раскомментируйте следующую строку в релизной версии.
         //DevExpress.Utils.Localization.XtraLocalizer.UserResourceManager = DXLocalization.ResourceManager;
         ApplicationConfiguration.Initialize();
         //string libsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Libs");

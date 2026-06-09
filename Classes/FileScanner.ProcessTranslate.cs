@@ -213,7 +213,21 @@ namespace AppCleaner
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            return WebUtility.HtmlEncode(result.Translation);
+            return NormalizeTranslation(result.Translation);
+        }
+
+        private static string NormalizeTranslation(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            text = WebUtility.HtmlDecode(text);
+
+            text = text.Replace("&amp;lt;", "<");
+            text = text.Replace("&amp;gt;", ">");
+            text = text.Replace("&amp;amp;", "&");
+
+            return text;
         }
 
         private static bool ShouldTranslateText(string text)
