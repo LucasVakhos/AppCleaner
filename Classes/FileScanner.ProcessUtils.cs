@@ -484,6 +484,7 @@ namespace AppCleaner;
             .Where(x => IsConcreteCsFile(x.Path))
             .Select(x => (x.Path!, x.Element));
     }
+
     private static IEnumerable<(string Path, XElement Element)> GetCompileItems(XDocument doc, XNamespace ns)
     {
         return doc
@@ -537,7 +538,7 @@ namespace AppCleaner;
         var field = typeof(ComboToDoItems).GetField(selectedAction.ToString());
         if (field is null)
             return;
-        var attr = (ComboItemAttribute?)SysAttr.GetCustomAttribute(field, typeof(ComboItemAttribute));
+        var attr = (ComboTodoAttribute?)SysAttr.GetCustomAttribute(field, typeof(ComboTodoAttribute));
         //var findText = attr.Pattern.
         _store.SearchPattern = (PatternType) attr.Pattern;
         AddToLog($"[Конфиг] MaskFindSymbolText установлен по умолчанию: {_store.FindText}");
@@ -550,7 +551,7 @@ namespace AppCleaner;
         var displayAttr = (DisplayAttribute?)SysAttr.GetCustomAttribute(field, typeof(DisplayAttribute));
         if (!string.IsNullOrWhiteSpace(displayAttr?.GetName()))
             return displayAttr.GetName()!;
-        var comboAttr = (ComboItemAttribute?)SysAttr.GetCustomAttribute(field, typeof(ComboItemAttribute));
+        var comboAttr = (ComboTodoAttribute?)SysAttr.GetCustomAttribute(field, typeof(ComboTodoAttribute));
         return !string.IsNullOrWhiteSpace(comboAttr?.Name)
             ? comboAttr.Name
             : value.ToString();
@@ -630,33 +631,37 @@ namespace AppCleaner;
             AddToLog("[Ошибка бэкапа] путь к файлу пустой.");
             return;
         }
+
         if (!File.Exists(filePath))
         {
             AddToLog($"[Ошибка бэкапа] файл не найден: {filePath}");
             return;
         }
+
         try
         {
-            var backupFolder = _store.PlaceFolder;
-            if (string.IsNullOrWhiteSpace(backupFolder))
-                backupFolder = Path.GetDirectoryName(filePath) ?? string.Empty;
+            var backupFolder = _store.BakFolder;
+
             if (string.IsNullOrWhiteSpace(backupFolder))
             {
                 AddToLog("[Ошибка бэкапа] не указана папка для бэкапов.");
                 return;
             }
+
             Directory.CreateDirectory(backupFolder);
+
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var fileName = Path.GetFileName(filePath);
             var backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.bak");
+
             for (int i = 1; File.Exists(backupFilePath); i++)
             {
                 backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.{i}.bak");
             }
-            using var source = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            using var destination = new FileStream(backupFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-            source.CopyTo(destination);
+
+            File.Copy(filePath, backupFilePath, overwrite: false);
             CopyFileTimestamps(filePath, backupFilePath);
+
             AddToLog($"[Бэкап создан] {backupFilePath}");
         }
         catch (Exception ex)

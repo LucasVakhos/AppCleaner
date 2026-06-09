@@ -5,7 +5,7 @@ using System.Configuration;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 namespace AppCleaner;
-public sealed class ScannerSetting : INotifyPropertyChanged
+    public sealed class ScannerSetting : INotifyPropertyChanged
 {
     [Saved]
     public Dictionary<ComboToDoItems, ActionSettings> ActionSettings { get; } = new()
@@ -46,6 +46,7 @@ public sealed class ScannerSetting : INotifyPropertyChanged
             .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
             .ToArray();
     }
+
     private string _findText = string.Empty;
     private string _replaceText = string.Empty;
     private string _searchFolder = string.Empty;
@@ -73,6 +74,7 @@ public sealed class ScannerSetting : INotifyPropertyChanged
             ?? Environment.GetEnvironmentVariable("APP_MASK_TOKEN")
             ?? string.Empty;
     }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     [Saved]
     public string FindText
@@ -179,27 +181,31 @@ public sealed class ScannerSetting : INotifyPropertyChanged
         get => _netVersion;
         set => SetField(ref _netVersion, value);
     }
+
     public bool DryRun => DryRunIndex == 0;
     public string LogText
     {
         get => _logText;
-        private set
+    private set
         {
             if (SetField(ref _logText, value))
                 OnPropertyChanged(nameof(SaveEnabled));
         }
     }
+
     public int TotalFiles
     {
         get => _totalFiles;
         set => SetField(ref _totalFiles, value);
     }
+
     public int TotalFolders => _totalFolders.Count;
     public int ProgressValue
     {
         get => _progressValue;
         set => SetField(ref _progressValue, Math.Min(Math.Max(0, value), ProgressMaximum));
     }
+
     public int ProgressMaximum
     {
         get => _progressMaximum;
@@ -214,16 +220,19 @@ public sealed class ScannerSetting : INotifyPropertyChanged
                 ProgressValue = _progressMaximum;
         }
     }
+
     public bool BeginEnabled
     {
         get => _beginEnabled;
-        private set => SetField(ref _beginEnabled, value);
+    private set => SetField(ref _beginEnabled, value);
     }
+
     public bool CancelEnabled
     {
         get => _cancelEnabled;
-        private set => SetField(ref _cancelEnabled, value);
+    private set => SetField(ref _cancelEnabled, value);
     }
+
     public bool IsWorking
     {
         get => _isWorking;
@@ -233,6 +242,7 @@ public sealed class ScannerSetting : INotifyPropertyChanged
                 RefreshCommandStates();
         }
     }
+
     public bool SaveEnabled => !string.IsNullOrEmpty(LogText);
     public void SetProgressMaximum(int value)
     {
@@ -375,6 +385,7 @@ public sealed class ScannerSetting : INotifyPropertyChanged
         AddPathes(searchValue);
         AddPathes(placeValue);
     }
+
     private bool SetField<T>(
         ref T field,
         T value,

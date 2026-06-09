@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text;
 namespace AppCleaner;
-public partial class FileScanner : XtraUserControl
+    public partial class FileScanner : XtraUserControl
 {
     private const int UiUpdateIntervalMs = 500;
     private const int BackupMaxAttempts = 10_000;
@@ -138,7 +138,7 @@ public partial class FileScanner : XtraUserControl
         foreach (ComboToDoItems item in Enum.GetValues<ComboToDoItems>())
         {
             _todoItems.Add(item);
-            var attr = item.GetAttribute<ComboItemAttribute>();
+            var attr = item.GetAttribute<ComboTodoAttribute>();
             cboSelectToDo.Properties.Items.Add(
                 attr?.Name ?? item.ToString());
         }
@@ -289,6 +289,7 @@ public partial class FileScanner : XtraUserControl
         _operationCts?.Cancel();
         _store.RefreshCommandStates();
     }
+
     private CancellationToken CurrentToken => _operationCts?.Token ?? CancellationToken.None;
     private void BeginOperation()
     {
@@ -407,7 +408,7 @@ public partial class FileScanner : XtraUserControl
             return;
         _store.SelectedActionIndex = cboSelectToDo.SelectedIndex;
         _todoType = GetTodoBySelectedIndex();
-        var attr = _todoType.GetAttribute<ComboItemAttribute>();
+        var attr = _todoType.GetAttribute<ComboTodoAttribute>();
         if (attr != null)
         {
             _store.SearchPattern = attr.Pattern;
@@ -568,7 +569,7 @@ public partial class FileScanner : XtraUserControl
     }
     private void SetupLayouts()
     {
-        var attr = TodoType.GetAttribute<ComboItemAttribute>();
+        var attr = TodoType.GetAttribute<ComboTodoAttribute>();
         bool isProcessFiles = attr?.OperationTypes == OperationTypes.ProcessFiles;
         bool isFindReplace = TodoType == ComboToDoItems.FindAndReplace;
         bool isFindAdd = TodoType == ComboToDoItems.FindValueOrClassAddScaveToProject;

@@ -7,6 +7,7 @@ namespace AppCleaner;
 public sealed class SavedAttribute : Attribute
 {
 }
+
     public sealed class IniFile
 {
     public static string DefaultFilePath =>
@@ -19,6 +20,7 @@ public sealed class SavedAttribute : Attribute
         : this(DefaultFilePath)
     {
     }
+
     public IniFile(string filePath)
     {
         _filePath = filePath;

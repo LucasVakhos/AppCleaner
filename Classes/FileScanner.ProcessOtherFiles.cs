@@ -310,6 +310,7 @@ namespace AppCleaner
                 ? new LineProcessResult(string.Empty, true)
                 : new LineProcessResult(line, false);
         }
+
     private readonly record struct LineProcessResult(string Line, bool Changed);
     }
 }

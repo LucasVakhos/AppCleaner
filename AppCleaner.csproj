@@ -75,10 +75,10 @@
 		<Compile Include="Classes\MainFormState.cs" />
 		<Compile Include="Ext\PathFilterType.cs" />
 		<Compile Include="Classes\ScannerSetting.cs" />
-		<Compile Include="Ext\ComboItemAttribute.cs" />
+		<Compile Include="Ext\ComboTodoAttribute.cs" />
 		<Compile Include="Ext\ComboNetItems.cs" />
 		<Compile Include="Ext\ComboNetItemsExtensions.cs" />
-		<Compile Include="Ext\ComboToDoItems.cs" />
+		<Compile Include="Ext\ComboTodoItems.cs" />
 		<Compile Include="Ext\ComponentExtension.cs" />
 		<Compile Include="Ext\ControlExtensions.cs" />
 		<Compile Include="Ext\CountersHelpers.cs" />

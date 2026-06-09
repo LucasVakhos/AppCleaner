@@ -17,6 +17,7 @@ namespace AppCleaner
             if (!enumType.IsEnum) throw new ArgumentException("Type must be an enum.", nameof(enumType));
             return Enum.GetNames(enumType).Length;
         }
+
     public static TAttribute? GetAttribute<TAttribute>(this Enum value)
             where TAttribute : Attribute
         {
@@ -26,6 +27,7 @@ namespace AppCleaner
                 .Cast<TAttribute>()
                 .FirstOrDefault();
         }
+
     public static TValue GetEnumValueByDescription<TEnum, TValue>(
             this TEnum enumValue,
             Func<TEnum, string> descriptionSelector)
