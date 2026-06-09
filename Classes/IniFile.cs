@@ -49,7 +49,7 @@ public sealed class SavedAttribute : Attribute
         foreach (var property in GetSavedProperties(obj.GetType()))
         {
             var value = property.GetValue(obj);
-            if (value is Dictionary<ComboToDoItems, ActionSettings> settings)
+            if (value is Dictionary<ComboTodoItems, ActionSettings> settings)
             {
                 SaveActionSettings(property.Name, settings);
                 continue;
@@ -64,7 +64,7 @@ public sealed class SavedAttribute : Attribute
         string section = obj.GetType().Name;
         foreach (var property in GetSavedProperties(obj.GetType()))
         {
-            if (property.GetValue(obj) is Dictionary<ComboToDoItems, ActionSettings> settings)
+            if (property.GetValue(obj) is Dictionary<ComboTodoItems, ActionSettings> settings)
             {
                 LoadActionSettings(property.Name, settings);
                 continue;
@@ -85,7 +85,7 @@ public sealed class SavedAttribute : Attribute
             }
         }
     }
-    public void SaveActionSettings(string propertyName, Dictionary<ComboToDoItems, ActionSettings> settings)
+    public void SaveActionSettings(string propertyName, Dictionary<ComboTodoItems, ActionSettings> settings)
     {
         foreach (var pair in settings)
         {
@@ -94,7 +94,7 @@ public sealed class SavedAttribute : Attribute
             Write(section, nameof(ActionSettings.PlaceValue), pair.Value.PlaceValue);
         }
     }
-    public void LoadActionSettings(string propertyName, Dictionary<ComboToDoItems, ActionSettings> settings)
+    public void LoadActionSettings(string propertyName, Dictionary<ComboTodoItems, ActionSettings> settings)
     {
         foreach (var pair in settings)
         {
@@ -174,7 +174,7 @@ public sealed class SavedAttribute : Attribute
         if (type.GetGenericTypeDefinition() != typeof(Dictionary<,>))
             return false;
         var args = type.GetGenericArguments();
-        return args[0] == typeof(ComboToDoItems)
+        return args[0] == typeof(ComboTodoItems)
             && args[1] == typeof(ActionSettings);
     }
     private static string ConvertToIniString(object? value)

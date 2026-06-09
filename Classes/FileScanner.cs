@@ -38,10 +38,10 @@ namespace AppCleaner;
     private CancellationTokenSource? _operationCts;
     private bool _suppressFolderEditValueChanged;
     private bool _suppressNetEditValueChanged;
-    private readonly List<ComboToDoItems> _todoItems = new();
+    private readonly List<ComboTodoItems> _todoItems = new();
     private readonly List<ComboNetItems> _netItems = new();
-    private ComboToDoItems TodoType => _todoType;
-    private ComboToDoItems _todoType;
+    private ComboTodoItems TodoType => _todoType;
+    private ComboTodoItems _todoType;
     public FileScanner()
     {
         InitializeComponent();
@@ -127,29 +127,39 @@ namespace AppCleaner;
     private void InitializeComboBoxes()
     {
         RefreshPathComboBoxes();
+
         cboSearchPatterns.Properties.Items.Clear();
         cboSearchPatterns.Properties.Items.AddRange(
             Enum.GetValues<PatternType>()
                 .Select(x => x.GetDisplayName())
                 .ToArray());
+
         SetSelectedPatternFromStore();
+
         cboSelectToDo.Properties.Items.Clear();
         _todoItems.Clear();
-        foreach (ComboToDoItems item in Enum.GetValues<ComboToDoItems>())
+
+        foreach (ComboTodoItems item in Enum.GetValues<ComboTodoItems>())
         {
             _todoItems.Add(item);
+
             var attr = item.GetAttribute<ComboTodoAttribute>();
+
             cboSelectToDo.Properties.Items.Add(
                 attr?.Name ?? item.ToString());
         }
+
         SetSelectedTodoFromStore();
+
         cboNET.Properties.Items.Clear();
         _netItems.Clear();
+
         foreach (ComboNetItems item in Enum.GetValues<ComboNetItems>())
         {
             _netItems.Add(item);
             cboNET.Properties.Items.Add(GetDisplayName(item));
         }
+
         SetSelectedNetFromStore();
     }
     private void SetSelectedPatternFromStore()
@@ -211,13 +221,18 @@ namespace AppCleaner;
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(x => x)
             .ToList();
+
         var pathes = _store.Pathes.ToArray();
+
         cboSearchFolder.Properties.Items.Clear();
         cboSearchFolder.Properties.Items.AddRange(pathes);
+
         cboPlaceFolder.Properties.Items.Clear();
         cboPlaceFolder.Properties.Items.AddRange(pathes);
+
         cboBakFolder.Properties.Items.Clear();
         cboBakFolder.Properties.Items.AddRange(pathes);
+
         cboBakFolder.EditValue = _store.BakFolder;
     }
     private static bool IsValidPath(string path)
@@ -320,50 +335,50 @@ namespace AppCleaner;
     {
         return TodoType switch
         {
-            ComboToDoItems.DeleteEmpty
-                or ComboToDoItems.DeleteRegionRows
-                or ComboToDoItems.FindAndReplace
+            ComboTodoItems.DeleteEmpty
+                or ComboTodoItems.DeleteRegionRows
+                or ComboTodoItems.FindAndReplace
                 => Task.Run(() => ScanAndProcessFiles(cancellationToken), cancellationToken),
-            ComboToDoItems.FindValueOrClassAddScaveToProject
+            ComboTodoItems.FindValueOrClassAddScaveToProject
                 => Task.Run(() => FindAndAddClassToProject(cancellationToken), cancellationToken),
-            ComboToDoItems.ClearNameSpace
+            ComboTodoItems.ClearNameSpace
                 => Task.Run(() => NormalizeNamespacesInDirectory(_store.DryRun, cancellationToken), cancellationToken),
-            ComboToDoItems.CollectAllNameSpaces
+            ComboTodoItems.CollectAllNameSpaces
                 => Task.Run(() => CollectAllNamespaces(cancellationToken), cancellationToken),
-            ComboToDoItems.CollectUsingPackages
+            ComboTodoItems.CollectUsingPackages
                 => Task.Run(() => CollectRequiredPackagesFromUsings(cancellationToken), cancellationToken),
-            ComboToDoItems.DeleteBakFiles
+            ComboTodoItems.DeleteBakFiles
                 => Task.Run(() => DeleteBakFiles(cancellationToken), cancellationToken),
-            ComboToDoItems.DeleteNonProjectFiles
+            ComboTodoItems.DeleteNonProjectFiles
                 => Task.Run(() => RemoveNonProjectFiles(_store.DryRun, cancellationToken), cancellationToken),
-            ComboToDoItems.SyncProjectFileWithSample
+            ComboTodoItems.SyncProjectFileWithSample
                 => Task.Run(() => SyncProjectFileWithSample(cancellationToken), cancellationToken),
-            ComboToDoItems.ConvertOldCsprojToSdkStyle
+            ComboTodoItems.ConvertOldCsprojToSdkStyle
                 => Task.Run(() => ConvertOldCsprojToSdkStyle(
                     _store.ProjectFile,
                     _store.NETVersion), cancellationToken),
-            ComboToDoItems.TranslateEnToRu
+            ComboTodoItems.TranslateEnToRu
                 => Task.Run(() => TranslateEnToRuFolderAsync(cancellationToken), cancellationToken),
-            ComboToDoItems.NormalizeMethodSignatures
+            ComboTodoItems.NormalizeMethodSignatures
                 => Task.Run(() => NormalizeMethodSignaturesFolderAsync(cancellationToken), cancellationToken),
-            ComboToDoItems.RestoreCSharpFilesFromBak
+            ComboTodoItems.RestoreCSharpFilesFromBak
                 => Task.Run(() => RestoreCSharpFilesFromBakFolderAsync(cancellationToken), cancellationToken),
-            ComboToDoItems.RestoreMissingUsings
+            ComboTodoItems.RestoreMissingUsings
                 => Task.Run(() => RecoveryMissingUsings(cancellationToken), cancellationToken),
-            ComboToDoItems.AddFilePathCommentToCsFiles =>
+            ComboTodoItems.AddFilePathCommentToCsFiles =>
                 Task.Run(() => AddFilePathCommentToCsFiles(cancellationToken), cancellationToken),
             _ => Task.CompletedTask
         };
     }
-    private ComboToDoItems GetSelectedAction()
+    private ComboTodoItems GetSelectedAction()
     {
         return TodoType;
     }
-    private ComboToDoItems GetTodoBySelectedIndex()
+    private ComboTodoItems GetTodoBySelectedIndex()
     {
         var index = cboSelectToDo.SelectedIndex;
         if (index < 0 || index >= _todoItems.Count)
-            return ComboToDoItems.DeleteEmpty;
+            return ComboTodoItems.DeleteEmpty;
         return _todoItems[index];
     }
     private void SetSelectedTodoFromStore()
@@ -376,10 +391,10 @@ namespace AppCleaner;
     {
         switch (TodoType)
         {
-            case ComboToDoItems.DeleteNonProjectFiles:
+            case ComboTodoItems.DeleteNonProjectFiles:
                 AddToLog($"Файл проекта: {_store.ProjectFile}");
                 break;
-            case ComboToDoItems.SyncProjectFileWithSample:
+            case ComboTodoItems.SyncProjectFileWithSample:
                 AddToLog($"Файл проекта: {_store.ProjectFile}");
                 AddToLog($"Образец файла проекта: {_store.SampleProjectFile}");
                 break;
@@ -387,9 +402,9 @@ namespace AppCleaner;
                 AddToLog($"Папка: {_store.SearchFolder}");
                 break;
         }
-        if (TodoType != ComboToDoItems.FindValueOrClassAddScaveToProject)
+        if (TodoType != ComboTodoItems.FindValueOrClassAddScaveToProject)
             AddToLog($"Маска файлов: {_store.SearchPattern}");
-        if (TodoType == ComboToDoItems.FindValueOrClassAddScaveToProject)
+        if (TodoType == ComboTodoItems.FindValueOrClassAddScaveToProject)
             AddToLog($"Папка назначения: {_store.PlaceFolder}");
     }
     #region UI events
@@ -406,21 +421,26 @@ namespace AppCleaner;
     {
         if (cboSelectToDo.SelectedIndex < 0 || cboSelectToDo.SelectedIndex >= _todoItems.Count)
             return;
+
         _store.SelectedActionIndex = cboSelectToDo.SelectedIndex;
         _todoType = GetTodoBySelectedIndex();
+
         var attr = _todoType.GetAttribute<ComboTodoAttribute>();
+
         if (attr != null)
         {
             _store.SearchPattern = attr.Pattern;
             SetSelectedPatternFromStore();
         }
+
         UpdatePathFilters(_todoType);
         SetupLayouts();
         SyncPathEditorFromStore();
+
         _store.RefreshCommandStates();
         RefreshUi();
     }
-    private void UpdatePathFilters(ComboToDoItems action)
+    private void UpdatePathFilters(ComboTodoItems action)
     {
         FillCombo(cboSearchFolder, _store.GetPathes(action, true));
         FillCombo(cboPlaceFolder, _store.GetPathes(action, false));
@@ -504,9 +524,9 @@ namespace AppCleaner;
     private string? ShowPathDialog()
     {
         bool useFileDialog =
-            TodoType == ComboToDoItems.DeleteNonProjectFiles ||
-            TodoType is ComboToDoItems.SyncProjectFileWithSample or ComboToDoItems.RestoreMissingUsings ||
-            TodoType == ComboToDoItems.ConvertOldCsprojToSdkStyle;
+            TodoType == ComboTodoItems.DeleteNonProjectFiles ||
+            TodoType is ComboTodoItems.SyncProjectFileWithSample or ComboTodoItems.RestoreMissingUsings ||
+            TodoType == ComboTodoItems.ConvertOldCsprojToSdkStyle;
         if (useFileDialog)
         {
             return openFileDlg.ShowDialog() == DialogResult.OK
@@ -524,16 +544,16 @@ namespace AppCleaner;
         {
             cboSearchFolder.EditValue = TodoType switch
             {
-                ComboToDoItems.DeleteNonProjectFiles => _store.ProjectFile,
-                ComboToDoItems.SyncProjectFileWithSample => _store.ProjectFile,
-                ComboToDoItems.ConvertOldCsprojToSdkStyle => _store.ProjectFile,
+                ComboTodoItems.DeleteNonProjectFiles => _store.ProjectFile,
+                ComboTodoItems.SyncProjectFileWithSample => _store.ProjectFile,
+                ComboTodoItems.ConvertOldCsprojToSdkStyle => _store.ProjectFile,
                 _ => _store.SearchFolder
             };
             cboPlaceFolder.EditValue = TodoType switch
             {
-                ComboToDoItems.SyncProjectFileWithSample => _store.SampleProjectFile,
-                ComboToDoItems.ConvertOldCsprojToSdkStyle => _store.SampleProjectFile,
-                ComboToDoItems.FindValueOrClassAddScaveToProject => _store.PlaceFolder,
+                ComboTodoItems.SyncProjectFileWithSample => _store.SampleProjectFile,
+                ComboTodoItems.ConvertOldCsprojToSdkStyle => _store.SampleProjectFile,
+                ComboTodoItems.FindValueOrClassAddScaveToProject => _store.PlaceFolder,
                 _ => string.Empty
             };
         }
@@ -550,14 +570,14 @@ namespace AppCleaner;
         string placeValue = cboPlaceFolder.EditValue?.ToString() ?? string.Empty;
         switch (TodoType)
         {
-            case ComboToDoItems.DeleteNonProjectFiles:
+            case ComboTodoItems.DeleteNonProjectFiles:
                 _store.ProjectFile = searchValue;
                 break;
-            case ComboToDoItems.SyncProjectFileWithSample:
-            case ComboToDoItems.ConvertOldCsprojToSdkStyle:
+            case ComboTodoItems.SyncProjectFileWithSample:
+            case ComboTodoItems.ConvertOldCsprojToSdkStyle:
                 _store.ProjectFile = searchValue;
                 break;
-            case ComboToDoItems.FindValueOrClassAddScaveToProject:
+            case ComboTodoItems.FindValueOrClassAddScaveToProject:
                 _store.SearchFolder = searchValue;
                 _store.PlaceFolder = placeValue;
                 break;
@@ -570,36 +590,43 @@ namespace AppCleaner;
     private void SetupLayouts()
     {
         var attr = TodoType.GetAttribute<ComboTodoAttribute>();
+
         bool isProcessFiles = attr?.OperationTypes == OperationTypes.ProcessFiles;
-        bool isFindReplace = TodoType == ComboToDoItems.FindAndReplace;
-        bool isFindAdd = TodoType == ComboToDoItems.FindValueOrClassAddScaveToProject;
-        bool isSync = TodoType is ComboToDoItems.SyncProjectFileWithSample or ComboToDoItems.RestoreMissingUsings;
-        bool isConvert = TodoType == ComboToDoItems.ConvertOldCsprojToSdkStyle;
+        bool useBackup = attr?.UseBakup == true;
+
+        bool isFindReplace = TodoType == ComboTodoItems.FindAndReplace;
+        bool isFindAdd = TodoType == ComboTodoItems.FindValueOrClassAddScaveToProject;
+        bool isSync = TodoType is ComboTodoItems.SyncProjectFileWithSample or ComboTodoItems.RestoreMissingUsings;
+        bool isConvert = TodoType == ComboTodoItems.ConvertOldCsprojToSdkStyle;
         bool isProjectMode = isFindAdd || isSync || isConvert;
+
         SetVisibility(lgFolders, isProcessFiles);
         SetVisibility(lcPlaceFolder, isFindAdd || isSync);
-        SetVisibility(lcBakFolder, isProcessFiles);
-        SetVisibility(lgOptions, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
+        SetVisibility(lcBakFolder, useBackup);
+
+        SetVisibility(lgOptions, TodoType is ComboTodoItems.ClearNameSpace or ComboTodoItems.DeleteNonProjectFiles);
+
         lcSearchFolder.Text = attr?.SearchLabel ?? "Cканировать папку:";
         lcPlaceFolder.Text = attr?.PlaceLabel ?? "Папка для найденного:";
+
         SetVisibility(lcNetVersion, isConvert);
         SetVisibility(emptySearchExt, !isProjectMode);
         SetVisibility(lcSearchMask, !isProjectMode);
-        SetVisibility(lcDRY_RUN, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
+        SetVisibility(lcDRY_RUN, TodoType is ComboTodoItems.ClearNameSpace or ComboTodoItems.DeleteNonProjectFiles);
         SetVisibility(lcFind, isFindReplace || isFindAdd);
         SetVisibility(lcReplace, isFindReplace);
-        cboSearchFolder.Properties.NullValuePrompt =
-            isConvert
-                ? "Установите старый файл проекта..."
-                : isProjectMode
-                    ? "Установите файл проекта для сравнения..."
-                    : "Установите папку для сканирования...";
-        cboPlaceFolder.Properties.NullValuePrompt =
-            isConvert
-                ? "Установите путь нового SDK-style проекта..."
-                : isSync
-                    ? "Установите образец файла проекта..."
-                    : "Установите папку куда копировать найденное...";
+
+        cboSearchFolder.Properties.NullValuePrompt = isConvert
+            ? "Установите старый файл проекта..."
+            : isProjectMode
+                ? "Установите файл проекта для сравнения..."
+                : "Установите папку для сканирования...";
+
+        cboPlaceFolder.Properties.NullValuePrompt = isConvert
+            ? "Установите путь нового SDK-style проекта..."
+            : isSync
+                ? "Установите образец файла проекта..."
+                : "Установите папку куда копировать найденное...";
     }
     private static void SetVisibility(BaseLayoutItem item, bool visible)
     {

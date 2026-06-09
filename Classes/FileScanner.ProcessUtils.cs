@@ -4,19 +4,24 @@ using System.Text;
 using System.Xml.Linq;
 using SysAttr = System.Attribute;
 namespace AppCleaner;
-    public partial class FileScanner
+
+public partial class FileScanner
 {
     #region Validation
+    private bool ShouldCreateBackup()
+    {
+        return TodoType.GetAttribute<ComboTodoAttribute>()?.UseBakup == true;
+    }
     private bool ValidateSelected()
     {
         return TodoType switch
         {
-            ComboToDoItems.DeleteNonProjectFiles => DeleteNonProjectFile(),
-            ComboToDoItems.SyncProjectFileWithSample => ValidateSyncProjectFileWithSample(),
-            ComboToDoItems.RestoreMissingUsings => ValidateSyncProjectFileWithSample(),
-            ComboToDoItems.ConvertOldCsprojToSdkStyle => ValidateConvertOldCsprojToSdkStyle(),
-            ComboToDoItems.FindValueOrClassAddScaveToProject => ValidateFindAddToProject(),
-            ComboToDoItems.FindAndReplace => ValidateFolder() && ValidateFindText(),
+            ComboTodoItems.DeleteNonProjectFiles => DeleteNonProjectFile(),
+            ComboTodoItems.SyncProjectFileWithSample => ValidateSyncProjectFileWithSample(),
+            ComboTodoItems.RestoreMissingUsings => ValidateSyncProjectFileWithSample(),
+            ComboTodoItems.ConvertOldCsprojToSdkStyle => ValidateConvertOldCsprojToSdkStyle(),
+            ComboTodoItems.FindValueOrClassAddScaveToProject => ValidateFindAddToProject(),
+            ComboTodoItems.FindAndReplace => ValidateFolder() && ValidateFindText(),
             _ => ValidateFolder()
         };
     }
@@ -535,12 +540,12 @@ namespace AppCleaner;
         var selectedAction = GetSelectedAction();
         if (!string.IsNullOrWhiteSpace(_store.FindText))
             return;
-        var field = typeof(ComboToDoItems).GetField(selectedAction.ToString());
+        var field = typeof(ComboTodoItems).GetField(selectedAction.ToString());
         if (field is null)
             return;
         var attr = (ComboTodoAttribute?)SysAttr.GetCustomAttribute(field, typeof(ComboTodoAttribute));
         //var findText = attr.Pattern.
-        _store.SearchPattern = (PatternType) attr.Pattern;
+        _store.SearchPattern = (PatternType)attr.Pattern;
         AddToLog($"[Конфиг] MaskFindSymbolText установлен по умолчанию: {_store.FindText}");
     }
     private static string GetDisplayName(Enum value)
@@ -626,6 +631,9 @@ namespace AppCleaner;
     }
     private void CreateBackup(string filePath)
     {
+        if (!ShouldCreateBackup())
+            return;
+
         if (string.IsNullOrWhiteSpace(filePath))
         {
             AddToLog("[Ошибка бэкапа] путь к файлу пустой.");

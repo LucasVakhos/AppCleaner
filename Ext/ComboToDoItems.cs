@@ -1,8 +1,8 @@
-//ComboItemsTypes
+//ComboTodoItems
 #nullable disable
 namespace AppCleaner;
 
-public enum ComboTooItems
+public enum ComboTodoItems
 {
     [ComboTodo(
         Name = "Удалить пустые строки...",

@@ -8,30 +8,30 @@ namespace AppCleaner;
     public sealed class ScannerSetting : INotifyPropertyChanged
 {
     [Saved]
-    public Dictionary<ComboToDoItems, ActionSettings> ActionSettings { get; } = new()
+    public Dictionary<ComboTodoItems, ActionSettings> ActionSettings { get; } = new()
     {
-        [ComboToDoItems.DeleteEmpty] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.DeleteRegionRows] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.FindAndReplace] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.FindValueOrClassAddScaveToProject] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Project },
-        [ComboToDoItems.ClearNameSpace] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.CollectAllNameSpaces] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.CollectUsingPackages] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.DeleteBakFiles] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.DeleteNonProjectFiles] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.SyncProjectFileWithSample] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Project },
-        [ComboToDoItems.ConvertOldCsprojToSdkStyle] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Project },
-        [ComboToDoItems.TranslateEnToRu] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.NormalizeMethodSignatures] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.RestoreCSharpFilesFromBak] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-        [ComboToDoItems.RestoreMissingUsings] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Project },
-        [ComboToDoItems.AddFilePathCommentToCsFiles] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.DeleteEmpty] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.DeleteRegionRows] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.FindAndReplace] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.FindValueOrClassAddScaveToProject] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Project },
+        [ComboTodoItems.ClearNameSpace] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.CollectAllNameSpaces] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.CollectUsingPackages] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.DeleteBakFiles] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.DeleteNonProjectFiles] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.SyncProjectFileWithSample] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Project },
+        [ComboTodoItems.ConvertOldCsprojToSdkStyle] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Project },
+        [ComboTodoItems.TranslateEnToRu] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.NormalizeMethodSignatures] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.RestoreCSharpFilesFromBak] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
+        [ComboTodoItems.RestoreMissingUsings] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Project },
+        [ComboTodoItems.AddFilePathCommentToCsFiles] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
     };
-    public ActionSettings GetActionSettings(ComboToDoItems action)
+    public ActionSettings GetActionSettings(ComboTodoItems action)
     {
         return ActionSettings[action];
     }
-    public string[] GetPathes(ComboToDoItems action, bool search)
+    public string[] GetPathes(ComboTodoItems action, bool search)
     {
         var settings = GetActionSettings(action);
         var type = search ? settings.SearchPathType : settings.PlacePathType;
@@ -257,20 +257,20 @@ namespace AppCleaner;
     {
         var action = SelectedActionIndex < 0
             ? default
-            : (ComboToDoItems)SelectedActionIndex;
+            : (ComboTodoItems)SelectedActionIndex;
         BeginEnabled = !IsWorking && action switch
         {
-            ComboToDoItems.DeleteNonProjectFiles =>
+            ComboTodoItems.DeleteNonProjectFiles =>
                 !string.IsNullOrWhiteSpace(ProjectFile),
-            ComboToDoItems.ConvertOldCsprojToSdkStyle =>
+            ComboTodoItems.ConvertOldCsprojToSdkStyle =>
                 !string.IsNullOrWhiteSpace(ProjectFile),
-            ComboToDoItems.SyncProjectFileWithSample =>
+            ComboTodoItems.SyncProjectFileWithSample =>
                 !string.IsNullOrWhiteSpace(ProjectFile) &&
                 !string.IsNullOrWhiteSpace(SampleProjectFile),
-            ComboToDoItems.RestoreMissingUsings =>
+            ComboTodoItems.RestoreMissingUsings =>
                 !string.IsNullOrWhiteSpace(ProjectFile) &&
                 !string.IsNullOrWhiteSpace(SampleProjectFile),
-            ComboToDoItems.FindValueOrClassAddScaveToProject =>
+            ComboTodoItems.FindValueOrClassAddScaveToProject =>
                 !string.IsNullOrWhiteSpace(SearchFolder) &&
                 !string.IsNullOrWhiteSpace(PlaceFolder),
             _ =>
@@ -361,23 +361,23 @@ namespace AppCleaner;
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    public string? GetSearchValue(ComboToDoItems action)
+    public string? GetSearchValue(ComboTodoItems action)
     {
         return GetActionSettings(action).SearchValue;
     }
-    public string? GetPlaceValue(ComboToDoItems action)
+    public string? GetPlaceValue(ComboTodoItems action)
     {
         return GetActionSettings(action).PlaceValue;
     }
-    public void SetSearchValue(ComboToDoItems action, string? value)
+    public void SetSearchValue(ComboTodoItems action, string? value)
     {
         GetActionSettings(action).SearchValue = value;
     }
-    public void SetPlaceValue(ComboToDoItems action, string? value)
+    public void SetPlaceValue(ComboTodoItems action, string? value)
     {
         GetActionSettings(action).PlaceValue = value;
     }
-    public void SetCurrentActionValues(ComboToDoItems action, string? searchValue, string? placeValue)
+    public void SetCurrentActionValues(ComboTodoItems action, string? searchValue, string? placeValue)
     {
         var settings = GetActionSettings(action);
         settings.SearchValue = searchValue ?? string.Empty;
