@@ -62,7 +62,8 @@ namespace AppCleaner
             )]
         TranslateEnToRu,
         [ComboItem(
-            Name = "Нормализовать сигнатуры методов..."
+            Name = "Нормализовать сигнатуры методов...",
+            OperationTypes = OperationTypes.ProcessFiles
             )]
         NormalizeMethodSignatures,
         [ComboItem(

@@ -29,6 +29,11 @@ namespace AppCleaner
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
+            EditorButtonImageOptions editorButtonImageOptions3 = new EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject9 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject10 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject11 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject12 = new DevExpress.Utils.SerializableAppearanceObject();
             layoutControl = new DevExpress.XtraDataLayout.DataLayoutControl();
             cboPlaceFolder = new DevExpress.XtraEditors.ComboBoxEdit();
             cboSelectToDo = new DevExpress.XtraEditors.ComboBoxEdit();
@@ -45,6 +50,7 @@ namespace AppCleaner
             txtReplace = new DevExpress.XtraEditors.TextEdit();
             cboNET = new DevExpress.XtraEditors.ComboBoxEdit();
             btnSave = new DevExpress.XtraEditors.SimpleButton();
+            cboBakFolder = new DevExpress.XtraEditors.ComboBoxEdit();
             Root = new DevExpress.XtraLayout.LayoutControlGroup();
             lgMain = new DevExpress.XtraLayout.LayoutControlGroup();
             lgTop = new DevExpress.XtraLayout.LayoutControlGroup();
@@ -54,12 +60,13 @@ namespace AppCleaner
             lgFolders = new DevExpress.XtraLayout.LayoutControlGroup();
             lcSearchFolder = new DevExpress.XtraLayout.LayoutControlItem();
             lcPlaceFolder = new DevExpress.XtraLayout.LayoutControlItem();
+            lcBakFolder = new DevExpress.XtraLayout.LayoutControlItem();
             lgOptions = new DevExpress.XtraLayout.LayoutControlGroup();
             lcDRY_RUN = new DevExpress.XtraLayout.LayoutControlItem();
             lcFind = new DevExpress.XtraLayout.LayoutControlItem();
-            lcReplace = new DevExpress.XtraLayout.LayoutControlItem();
             emptySpaceItem2 = new DevExpress.XtraLayout.EmptySpaceItem();
             lcNetVersion = new DevExpress.XtraLayout.LayoutControlItem();
+            lcReplace = new DevExpress.XtraLayout.LayoutControlItem();
             lgInfo = new DevExpress.XtraLayout.LayoutControlGroup();
             lcLogMemo = new DevExpress.XtraLayout.LayoutControlItem();
             lgProcess = new DevExpress.XtraLayout.LayoutControlGroup();
@@ -92,6 +99,7 @@ namespace AppCleaner
             ((ISupportInitialize)txtFind.Properties).BeginInit();
             ((ISupportInitialize)txtReplace.Properties).BeginInit();
             ((ISupportInitialize)cboNET.Properties).BeginInit();
+            ((ISupportInitialize)cboBakFolder.Properties).BeginInit();
             ((ISupportInitialize)Root).BeginInit();
             ((ISupportInitialize)lgMain).BeginInit();
             ((ISupportInitialize)lgTop).BeginInit();
@@ -101,12 +109,13 @@ namespace AppCleaner
             ((ISupportInitialize)lgFolders).BeginInit();
             ((ISupportInitialize)lcSearchFolder).BeginInit();
             ((ISupportInitialize)lcPlaceFolder).BeginInit();
+            ((ISupportInitialize)lcBakFolder).BeginInit();
             ((ISupportInitialize)lgOptions).BeginInit();
             ((ISupportInitialize)lcDRY_RUN).BeginInit();
             ((ISupportInitialize)lcFind).BeginInit();
-            ((ISupportInitialize)lcReplace).BeginInit();
             ((ISupportInitialize)emptySpaceItem2).BeginInit();
             ((ISupportInitialize)lcNetVersion).BeginInit();
+            ((ISupportInitialize)lcReplace).BeginInit();
             ((ISupportInitialize)lgInfo).BeginInit();
             ((ISupportInitialize)lcLogMemo).BeginInit();
             ((ISupportInitialize)lgProcess).BeginInit();
@@ -142,10 +151,11 @@ namespace AppCleaner
             layoutControl.Controls.Add(txtReplace);
             layoutControl.Controls.Add(cboNET);
             layoutControl.Controls.Add(btnSave);
+            layoutControl.Controls.Add(cboBakFolder);
             layoutControl.Dock = DockStyle.Fill;
             layoutControl.Location = new Point(0, 0);
             layoutControl.Name = "layoutControl";
-            layoutControl.OptionsCustomizationForm.DesignTimeCustomizationFormPositionAndSize = new Rectangle(832, 298, 883, 400);
+            layoutControl.OptionsCustomizationForm.DesignTimeCustomizationFormPositionAndSize = new Rectangle(832, 298, 650, 400);
             layoutControl.Root = Root;
             layoutControl.Size = new Size(783, 497);
             layoutControl.TabIndex = 1;
@@ -160,12 +170,12 @@ namespace AppCleaner
             cboPlaceFolder.Properties.Buttons.AddRange(new EditorButton[] { new EditorButton(ButtonPredefines.Combo), new EditorButton(ButtonPredefines.Ellipsis, "", 15, true, true, false, editorButtonImageOptions1, new DevExpress.Utils.KeyShortcut(Keys.None), serializableAppearanceObject1, serializableAppearanceObject2, serializableAppearanceObject3, serializableAppearanceObject4, "", null, null, DevExpress.Utils.ToolTipAnchor.Default) });
             cboPlaceFolder.Properties.Name = "searchFolder";
             cboPlaceFolder.Properties.NullText = "Установите папку куда копировать найденное...";
-            cboPlaceFolder.Properties.ButtonClick += searchFolder_BtnClick;
+            cboPlaceFolder.Properties.ButtonClick += cboFolder_BtnClick;
             cboPlaceFolder.Size = new Size(602, 20);
             cboPlaceFolder.StyleController = layoutControl;
             cboPlaceFolder.TabIndex = 3;
             cboPlaceFolder.Tag = "2";
-            cboPlaceFolder.EditValueChanged += txtFolder_EditValueChanged;
+            cboPlaceFolder.EditValueChanged += cboFolder_EditValueChanged;
             // 
             // cboSelectToDo
             // 
@@ -212,7 +222,7 @@ namespace AppCleaner
             btnCancel.ToolTip = "Остановить работу";
             btnCancel.Click += btnCancel_Click;
             // 
-            // cboSearchExt
+            // cboSearchPatterns
             // 
             cboSearchPatterns.EditValue = "*.cs";
             cboSearchPatterns.Location = new Point(162, 43);
@@ -244,12 +254,12 @@ namespace AppCleaner
             cboSearchFolder.Properties.Buttons.AddRange(new EditorButton[] { new EditorButton(ButtonPredefines.Combo), new EditorButton(ButtonPredefines.Ellipsis, "", 15, true, true, false, editorButtonImageOptions2, new DevExpress.Utils.KeyShortcut(Keys.None), serializableAppearanceObject5, serializableAppearanceObject6, serializableAppearanceObject7, serializableAppearanceObject8, "", null, null, DevExpress.Utils.ToolTipAnchor.Default) });
             cboSearchFolder.Properties.Name = "searchFolder";
             cboSearchFolder.Properties.NullText = "Установите папку для сканирования...";
-            cboSearchFolder.Properties.ButtonClick += searchFolder_BtnClick;
+            cboSearchFolder.Properties.ButtonClick += cboFolder_BtnClick;
             cboSearchFolder.Size = new Size(602, 20);
             cboSearchFolder.StyleController = layoutControl;
             cboSearchFolder.TabIndex = 2;
             cboSearchFolder.Tag = "1";
-            cboSearchFolder.EditValueChanged += searchFolder_EditValueChanged;
+            cboSearchFolder.EditValueChanged += cboFolder_EditValueChanged;
             // 
             // foundFolders
             // 
@@ -284,7 +294,7 @@ namespace AppCleaner
             // 
             // logMemo
             // 
-            logMemo.Location = new Point(162, 211);
+            logMemo.Location = new Point(162, 235);
             logMemo.Name = "logMemo";
             logMemo.Properties.Appearance.BackColor = SystemColors.ControlLightLight;
             logMemo.Properties.Appearance.ForeColor = SystemColors.ControlText;
@@ -292,14 +302,14 @@ namespace AppCleaner
             logMemo.Properties.Appearance.Options.UseForeColor = true;
             logMemo.Properties.NullText = "Лог процесса...";
             logMemo.Properties.ReadOnly = true;
-            logMemo.Size = new Size(602, 219);
+            logMemo.Size = new Size(602, 195);
             logMemo.StyleController = layoutControl;
             logMemo.TabIndex = 1;
             logMemo.TabStop = false;
             // 
             // cboDRY_RUN
             // 
-            cboDRY_RUN.Location = new Point(162, 139);
+            cboDRY_RUN.Location = new Point(162, 163);
             cboDRY_RUN.Name = "cboDRY_RUN";
             cboDRY_RUN.Properties.Buttons.AddRange(new EditorButton[] { new EditorButton(ButtonPredefines.Combo) });
             cboDRY_RUN.Properties.Items.AddRange(new object[] { "Имитация", "Удаление" });
@@ -313,7 +323,7 @@ namespace AppCleaner
             // 
             // txtFind
             // 
-            txtFind.Location = new Point(162, 163);
+            txtFind.Location = new Point(162, 187);
             txtFind.Name = "txtFind";
             txtFind.Size = new Size(189, 20);
             txtFind.StyleController = layoutControl;
@@ -321,7 +331,7 @@ namespace AppCleaner
             // 
             // txtReplace
             // 
-            txtReplace.Location = new Point(162, 187);
+            txtReplace.Location = new Point(162, 211);
             txtReplace.Name = "txtReplace";
             txtReplace.Size = new Size(189, 20);
             txtReplace.StyleController = layoutControl;
@@ -329,7 +339,7 @@ namespace AppCleaner
             // 
             // cboNET
             // 
-            cboNET.Location = new Point(162, 115);
+            cboNET.Location = new Point(162, 139);
             cboNET.Name = "cboNET";
             cboNET.Properties.Buttons.AddRange(new EditorButton[] { new EditorButton(ButtonPredefines.Combo) });
             cboNET.Properties.NullText = "Установите версию .NET";
@@ -348,6 +358,17 @@ namespace AppCleaner
             btnSave.TabIndex = 12;
             btnSave.Text = "Сохранритиь лог";
             btnSave.Click += btnSave_Click;
+            // 
+            // cboBakFolder
+            // 
+            cboBakFolder.Location = new Point(162, 115);
+            cboBakFolder.Name = "cboBakFolder";
+            cboBakFolder.Properties.Buttons.AddRange(new EditorButton[] { new EditorButton(ButtonPredefines.Combo), new EditorButton(ButtonPredefines.Ellipsis, "", 15, true, true, false, editorButtonImageOptions3, new DevExpress.Utils.KeyShortcut(Keys.None), serializableAppearanceObject9, serializableAppearanceObject10, serializableAppearanceObject11, serializableAppearanceObject12, "", null, null, DevExpress.Utils.ToolTipAnchor.Default) });
+            cboBakFolder.Properties.ButtonClick += cboFolder_BtnClick;
+            cboBakFolder.Size = new Size(602, 20);
+            cboBakFolder.StyleController = layoutControl;
+            cboBakFolder.TabIndex = 13;
+            cboBakFolder.EditValueChanged += cboFolder_EditValueChanged;
             // 
             // Root
             // 
@@ -419,11 +440,11 @@ namespace AppCleaner
             // 
             lgFolders.CustomizationFormText = "lgFOLDERS";
             lgFolders.GroupBordersVisible = false;
-            lgFolders.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] { lcSearchFolder, lcPlaceFolder });
+            lgFolders.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] { lcSearchFolder, lcPlaceFolder, lcBakFolder });
             lgFolders.Location = new Point(0, 48);
             lgFolders.Name = "lgFolders";
             lgFolders.Padding = new DevExpress.XtraLayout.Utils.Padding(9, 9, 9, 9);
-            lgFolders.Size = new Size(749, 48);
+            lgFolders.Size = new Size(749, 72);
             lgFolders.TextVisible = false;
             // 
             // lcSearchFolder
@@ -455,12 +476,21 @@ namespace AppCleaner
             lcPlaceFolder.Text = "Папка для найденного:";
             lcPlaceFolder.TextSize = new Size(131, 13);
             // 
+            // lcBakFolder
+            // 
+            lcBakFolder.Control = cboBakFolder;
+            lcBakFolder.Location = new Point(0, 48);
+            lcBakFolder.Name = "lcBakFolder";
+            lcBakFolder.Size = new Size(749, 24);
+            lcBakFolder.Text = "Папка для *.bak файлов:";
+            lcBakFolder.TextSize = new Size(131, 13);
+            // 
             // lgOptions
             // 
             lgOptions.CustomizationFormText = "lgOPTONS";
             lgOptions.GroupBordersVisible = false;
             lgOptions.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] { lcDRY_RUN, lcFind, emptySpaceItem2, lcNetVersion, lcReplace });
-            lgOptions.Location = new Point(0, 96);
+            lgOptions.Location = new Point(0, 120);
             lgOptions.Name = "lgOptions";
             lgOptions.Padding = new DevExpress.XtraLayout.Utils.Padding(0, 0, 0, 0);
             lgOptions.Size = new Size(749, 96);
@@ -493,19 +523,6 @@ namespace AppCleaner
             lcFind.Text = "Что ищем:";
             lcFind.TextSize = new Size(131, 13);
             // 
-            // lcReplace
-            // 
-            lcReplace.Control = txtReplace;
-            lcReplace.CustomizationFormText = "lcReplace";
-            lcReplace.Location = new Point(0, 72);
-            lcReplace.MaxSize = new Size(0, 24);
-            lcReplace.MinSize = new Size(197, 24);
-            lcReplace.Name = "lcReplace";
-            lcReplace.Size = new Size(336, 24);
-            lcReplace.SizeConstraintsType = DevExpress.XtraLayout.SizeConstraintsType.Custom;
-            lcReplace.Text = "Заменяем на:";
-            lcReplace.TextSize = new Size(131, 13);
-            // 
             // emptySpaceItem2
             // 
             emptySpaceItem2.Location = new Point(336, 0);
@@ -522,14 +539,27 @@ namespace AppCleaner
             lcNetVersion.Text = "Версия .NET:";
             lcNetVersion.TextSize = new Size(131, 13);
             // 
+            // lcReplace
+            // 
+            lcReplace.Control = txtReplace;
+            lcReplace.CustomizationFormText = "lcReplace";
+            lcReplace.Location = new Point(0, 72);
+            lcReplace.MaxSize = new Size(0, 24);
+            lcReplace.MinSize = new Size(197, 24);
+            lcReplace.Name = "lcReplace";
+            lcReplace.Size = new Size(336, 24);
+            lcReplace.SizeConstraintsType = DevExpress.XtraLayout.SizeConstraintsType.Custom;
+            lcReplace.Text = "Заменяем на:";
+            lcReplace.TextSize = new Size(131, 13);
+            // 
             // lgInfo
             // 
             lgInfo.CustomizationFormText = "lgINFO";
             lgInfo.GroupBordersVisible = false;
             lgInfo.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] { lcLogMemo, lgProcess });
-            lgInfo.Location = new Point(0, 192);
+            lgInfo.Location = new Point(0, 216);
             lgInfo.Name = "lgInfo";
-            lgInfo.Size = new Size(749, 271);
+            lgInfo.Size = new Size(749, 247);
             lgInfo.TextVisible = false;
             // 
             // lcLogMemo
@@ -542,7 +572,7 @@ namespace AppCleaner
             lcLogMemo.Location = new Point(0, 0);
             lcLogMemo.MinSize = new Size(157, 18);
             lcLogMemo.Name = "lcLogMemo";
-            lcLogMemo.Size = new Size(749, 223);
+            lcLogMemo.Size = new Size(749, 199);
             lcLogMemo.SizeConstraintsType = DevExpress.XtraLayout.SizeConstraintsType.Custom;
             lcLogMemo.Text = "Лог процесса:";
             lcLogMemo.TextSize = new Size(131, 13);
@@ -552,7 +582,7 @@ namespace AppCleaner
             lgProcess.CustomizationFormText = "lgPROCESS";
             lgProcess.GroupBordersVisible = false;
             lgProcess.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] { lcFoundFiles, lgButtons, lcFoundFolders, emptySpaceItem1, lcProgress });
-            lgProcess.Location = new Point(0, 223);
+            lgProcess.Location = new Point(0, 199);
             lgProcess.Name = "lgProcess";
             lgProcess.Padding = new DevExpress.XtraLayout.Utils.Padding(2, 2, 2, 2);
             lgProcess.Size = new Size(749, 48);
@@ -697,6 +727,7 @@ namespace AppCleaner
             ((ISupportInitialize)txtFind.Properties).EndInit();
             ((ISupportInitialize)txtReplace.Properties).EndInit();
             ((ISupportInitialize)cboNET.Properties).EndInit();
+            ((ISupportInitialize)cboBakFolder.Properties).EndInit();
             ((ISupportInitialize)Root).EndInit();
             ((ISupportInitialize)lgMain).EndInit();
             ((ISupportInitialize)lgTop).EndInit();
@@ -706,12 +737,13 @@ namespace AppCleaner
             ((ISupportInitialize)lgFolders).EndInit();
             ((ISupportInitialize)lcSearchFolder).EndInit();
             ((ISupportInitialize)lcPlaceFolder).EndInit();
+            ((ISupportInitialize)lcBakFolder).EndInit();
             ((ISupportInitialize)lgOptions).EndInit();
             ((ISupportInitialize)lcDRY_RUN).EndInit();
             ((ISupportInitialize)lcFind).EndInit();
-            ((ISupportInitialize)lcReplace).EndInit();
             ((ISupportInitialize)emptySpaceItem2).EndInit();
             ((ISupportInitialize)lcNetVersion).EndInit();
+            ((ISupportInitialize)lcReplace).EndInit();
             ((ISupportInitialize)lgInfo).EndInit();
             ((ISupportInitialize)lcLogMemo).EndInit();
             ((ISupportInitialize)lgProcess).EndInit();
@@ -786,5 +818,7 @@ namespace AppCleaner
         private DevExpress.XtraLayout.LayoutControlGroup lgMain;
         private DevExpress.XtraLayout.LayoutControlGroup lgButtons;
         private DevExpress.XtraLayout.EmptySpaceItem emptySpaceItem1;
+        private DevExpress.XtraEditors.ComboBoxEdit cboBakFolder;
+        private DevExpress.XtraLayout.LayoutControlItem lcBakFolder;
     }
 }

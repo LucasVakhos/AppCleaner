@@ -5,7 +5,7 @@ using System.Configuration;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 namespace AppCleaner;
-    public sealed class ScannerSetting : INotifyPropertyChanged
+public sealed class ScannerSetting : INotifyPropertyChanged
 {
     [Saved]
     public Dictionary<ComboToDoItems, ActionSettings> ActionSettings { get; } = new()
@@ -68,6 +68,8 @@ namespace AppCleaner;
     private string _sampleProject = string.Empty;
     private ComboNetItems _netVersion = ComboNetItems.net80;
     private List<string> _pathes = new();
+    private string _bakFolder;
+
     public ScannerSetting()
     {
         _findText =
@@ -114,6 +116,17 @@ namespace AppCleaner;
         set
         {
             if (SetField(ref _placeFolder, value ?? string.Empty))
+                RefreshCommandStates();
+        }
+    }
+    [Saved]
+    [Pathes]
+    public string BakFolder
+    {
+        get => _placeFolder;
+        set
+        {
+            if (SetField(ref _bakFolder, value ?? string.Empty))
                 RefreshCommandStates();
         }
     }
@@ -176,7 +189,7 @@ namespace AppCleaner;
     public string LogText
     {
         get => _logText;
-    private set
+        private set
         {
             if (SetField(ref _logText, value))
                 OnPropertyChanged(nameof(SaveEnabled));
@@ -214,13 +227,13 @@ namespace AppCleaner;
     public bool BeginEnabled
     {
         get => _beginEnabled;
-    private set => SetField(ref _beginEnabled, value);
+        private set => SetField(ref _beginEnabled, value);
     }
 
     public bool CancelEnabled
     {
         get => _cancelEnabled;
-    private set => SetField(ref _cancelEnabled, value);
+        private set => SetField(ref _cancelEnabled, value);
     }
 
     public bool IsWorking

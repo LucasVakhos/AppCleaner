@@ -236,11 +236,43 @@ namespace AppCleaner;
     }
     private void RefreshPathComboBoxes()
     {
+        _store.Pathes = _store.Pathes
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Where(IsValidPath)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x)
+            .ToList();
+
         var pathes = _store.Pathes.ToArray();
+
         cboSearchFolder.Properties.Items.Clear();
         cboSearchFolder.Properties.Items.AddRange(pathes);
+
         cboPlaceFolder.Properties.Items.Clear();
         cboPlaceFolder.Properties.Items.AddRange(pathes);
+
+        cboBakFolder.Properties.Items.Clear();
+        cboBakFolder.Properties.Items.AddRange(pathes);
+    }
+    private static bool IsValidPath(string path)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(path))
+                return false;
+
+            if (Directory.Exists(path))
+                return true;
+
+            if (File.Exists(path))
+                return true;
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
     }
     private void InitializeControls()
     {
@@ -492,17 +524,12 @@ namespace AppCleaner;
     {
         _store.RefreshCommandStates();
     }
-    private void txtFolder_EditValueChanged(object sender, EventArgs e)
+    private void cboFolder_EditValueChanged(object sender, EventArgs e)
     {
         UpdatePathsFromEditor();
         _store.RefreshCommandStates();
     }
-    private void searchFolder_EditValueChanged(object sender, EventArgs e)
-    {
-        UpdatePathsFromEditor();
-        _store.RefreshCommandStates();
-    }
-    private void searchFolder_BtnClick(object sender, ButtonPressedEventArgs e)
+    private void cboFolder_BtnClick(object sender, ButtonPressedEventArgs e)
     {
         if (e.Button.Kind == ButtonPredefines.Combo)
         {
@@ -598,8 +625,12 @@ namespace AppCleaner;
         bool isSync = TodoType is ComboToDoItems.SyncProjectFileWithSample or ComboToDoItems.RestoreMissingUsings;
         bool isConvert = TodoType == ComboToDoItems.ConvertOldCsprojToSdkStyle;
         bool isProjectMode = isFindAdd || isSync || isConvert;
+        
 
         SetVisibility(lgFolders, isProcessFiles);
+        SetVisibility(lcPlaceFolder, isFindAdd || isSync);
+        SetVisibility(lcBakFolder, isProcessFiles);
+
         SetVisibility(lgOptions, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
 
         lcSearchFolder.Text = attr?.SearchLabel ?? "Cканировать папку:";
@@ -611,8 +642,7 @@ namespace AppCleaner;
         SetVisibility(lcDRY_RUN, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
         SetVisibility(lcFind, isFindReplace || isFindAdd);
         SetVisibility(lcReplace, isFindReplace);
-        SetVisibility(lcPlaceFolder, isFindAdd || isSync);
-
+        
         cboSearchFolder.Properties.NullValuePrompt =
             isConvert
                 ? "Установите старый файл проекта..."

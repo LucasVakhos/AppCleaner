@@ -655,14 +655,32 @@ namespace AppCleaner;
 
         try
         {
+            var backupFolder = _store.PlaceFolder;
+
+            if (string.IsNullOrWhiteSpace(backupFolder))
+                backupFolder = Path.GetDirectoryName(filePath) ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(backupFolder))
+            {
+                AddToLog("[Ошибка бэкапа] не указана папка для бэкапов.");
+                return;
+            }
+
+            Directory.CreateDirectory(backupFolder);
+
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var backupFilePath = $"{filePath}.{timestamp}.bak";
+            var fileName = Path.GetFileName(filePath);
+            var backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.bak");
+
+            for (int i = 1; File.Exists(backupFilePath); i++)
+            {
+                backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.{i}.bak");
+            }
 
             using var source = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             using var destination = new FileStream(backupFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
 
             source.CopyTo(destination);
-
             CopyFileTimestamps(filePath, backupFilePath);
 
             AddToLog($"[Бэкап создан] {backupFilePath}");
