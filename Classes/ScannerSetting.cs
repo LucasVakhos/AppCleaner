@@ -26,7 +26,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
         [ComboToDoItems.RestoreCSharpFilesFromBak] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
         [ComboToDoItems.RestoreMissingUsings] = new() { SearchPathType = PathFilterType.Project, PlacePathType = PathFilterType.Project },
         [ComboToDoItems.AddFilePathCommentToCsFiles] = new() { SearchPathType = PathFilterType.Folder, PlacePathType = PathFilterType.Folder },
-
     };
     public ActionSettings GetActionSettings(ComboToDoItems action)
     {
@@ -36,7 +35,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
     {
         var settings = GetActionSettings(action);
         var type = search ? settings.SearchPathType : settings.PlacePathType;
-
         return Pathes
             .Where(path => !string.IsNullOrWhiteSpace(path))
             .Where(path =>
@@ -48,7 +46,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
             .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
             .ToArray();
     }
-
     private string _findText = string.Empty;
     private string _replaceText = string.Empty;
     private string _searchFolder = string.Empty;
@@ -69,7 +66,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
     private ComboNetItems _netVersion = ComboNetItems.net80;
     private List<string> _pathes = new();
     private string _bakFolder;
-
     public ScannerSetting()
     {
         _findText =
@@ -77,7 +73,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
             ?? Environment.GetEnvironmentVariable("APP_MASK_TOKEN")
             ?? string.Empty;
     }
-
     public event PropertyChangedEventHandler? PropertyChanged;
     [Saved]
     public string FindText
@@ -123,7 +118,7 @@ public sealed class ScannerSetting : INotifyPropertyChanged
     [Pathes]
     public string BakFolder
     {
-        get => _placeFolder;
+        get => _bakFolder;
         set
         {
             if (SetField(ref _bakFolder, value ?? string.Empty))
@@ -184,7 +179,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
         get => _netVersion;
         set => SetField(ref _netVersion, value);
     }
-
     public bool DryRun => DryRunIndex == 0;
     public string LogText
     {
@@ -195,20 +189,17 @@ public sealed class ScannerSetting : INotifyPropertyChanged
                 OnPropertyChanged(nameof(SaveEnabled));
         }
     }
-
     public int TotalFiles
     {
         get => _totalFiles;
         set => SetField(ref _totalFiles, value);
     }
-
     public int TotalFolders => _totalFolders.Count;
     public int ProgressValue
     {
         get => _progressValue;
         set => SetField(ref _progressValue, Math.Min(Math.Max(0, value), ProgressMaximum));
     }
-
     public int ProgressMaximum
     {
         get => _progressMaximum;
@@ -223,19 +214,16 @@ public sealed class ScannerSetting : INotifyPropertyChanged
                 ProgressValue = _progressMaximum;
         }
     }
-
     public bool BeginEnabled
     {
         get => _beginEnabled;
         private set => SetField(ref _beginEnabled, value);
     }
-
     public bool CancelEnabled
     {
         get => _cancelEnabled;
         private set => SetField(ref _cancelEnabled, value);
     }
-
     public bool IsWorking
     {
         get => _isWorking;
@@ -245,7 +233,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
                 RefreshCommandStates();
         }
     }
-
     public bool SaveEnabled => !string.IsNullOrEmpty(LogText);
     public void SetProgressMaximum(int value)
     {
@@ -284,7 +271,6 @@ public sealed class ScannerSetting : INotifyPropertyChanged
     public void SaveToIni()
     {
         AddPathesFromMarkedProperties();
-
         var ini = new IniFile();
         ini.SaveObject(this);
     }
@@ -292,10 +278,8 @@ public sealed class ScannerSetting : INotifyPropertyChanged
     {
         var ini = new IniFile();
         ini.LoadObject(this);
-
         if (!Enum.IsDefined(typeof(ComboNetItems), NETVersion))
             NETVersion = ComboNetItems.net80;
-
         RefreshCommandStates();
     }
     public void IncFiles()
@@ -386,14 +370,11 @@ public sealed class ScannerSetting : INotifyPropertyChanged
     public void SetCurrentActionValues(ComboToDoItems action, string? searchValue, string? placeValue)
     {
         var settings = GetActionSettings(action);
-
         settings.SearchValue = searchValue ?? string.Empty;
         settings.PlaceValue = placeValue ?? string.Empty;
-
         AddPathes(searchValue);
         AddPathes(placeValue);
     }
-
     private bool SetField<T>(
         ref T field,
         T value,

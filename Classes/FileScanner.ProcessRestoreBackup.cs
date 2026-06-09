@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-
 namespace AppCleaner
 {
     public partial class FileScanner
@@ -13,14 +12,11 @@ namespace AppCleaner
                 .GroupBy(GetTargetFilePathFromTimestampedBak)
                 .Select(group => group.OrderByDescending(File.GetCreationTimeUtc).First())
                 .ToArray();
-
             _store.SetProgressMaximum(backupFiles.Length);
             AddToLog($"Файлов .cs.*.bak для восстановления: {backupFiles.Length}");
-
             foreach (var backupFile in backupFiles)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
                 try
                 {
                     if (await RestoreCSharpFileFromBakAsync(backupFile, cancellationToken))
@@ -41,31 +37,24 @@ namespace AppCleaner
                     CountProcessedFile(backupFile);
                 }
             }
-
             AddToLog("Восстановление .cs из последнего timestamp .bak завершено.");
         }
     private async Task<bool> RestoreCSharpFileFromBakAsync(string backupFilePath, CancellationToken cancellationToken)
         {
             if (!IsTimestampedCSharpBackup(backupFilePath))
                 return false;
-
             if (!File.Exists(backupFilePath))
                 return false;
-
             var targetFilePath = GetTargetFilePathFromTimestampedBak(backupFilePath);
             var encoding = DetectFileEncoding(backupFilePath);
             var backupSource = await File.ReadAllTextAsync(backupFilePath, encoding, cancellationToken);
-
             await File.WriteAllTextAsync(targetFilePath, backupSource, encoding, cancellationToken);
-
             File.Delete(backupFilePath);
-
             return true;
         }
     private static bool IsTimestampedCSharpBackup(string filePath)
         {
             var fileName = Path.GetFileName(filePath);
-
             return Regex.IsMatch(
                 fileName,
                 @"^.+\.cs\.\d{8}_\d{6}\.bak$",

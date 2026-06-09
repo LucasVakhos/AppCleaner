@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text;
 namespace AppCleaner;
-    public partial class FileScanner : XtraUserControl
+public partial class FileScanner : XtraUserControl
 {
     private const int UiUpdateIntervalMs = 500;
     private const int BackupMaxAttempts = 10_000;
@@ -54,83 +54,66 @@ namespace AppCleaner;
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
-
         _store.LoadFromIni();
-
         SetSelectedPatternFromStore();
-
         openFileDlg.InitialDirectory = _store.SearchFolder;
         openFolderDlg.InitialDirectory = _store.SearchFolder;
-
         SetSelectedTodoFromStore();
         SetSelectedNetFromStore();
-
         RefreshPathComboBoxes();
-
         cboSelectToDo.SelectedIndex = _store.SelectedActionIndex;
         _todoType = GetTodoBySelectedIndex();
-
         UpdatePathFilters(_todoType);
         SetupLayouts();
         SyncPathEditorFromStore();
-
         _store.RefreshCommandStates();
         RefreshUi();
     }
     private void InitializeBindings()
     {
         bsFileScanner.DataSource = _store;
-
         txtFind.DataBindings.Add(
             "EditValue",
             bsFileScanner,
             nameof(ScannerSetting.FindText),
             true,
             DataSourceUpdateMode.OnPropertyChanged);
-
         txtReplace.DataBindings.Add(
             "EditValue",
             bsFileScanner,
             nameof(ScannerSetting.ReplaceText),
             true,
             DataSourceUpdateMode.OnPropertyChanged);
-
         // ВАЖНО:
         // cboSearchPatterns НЕ привязываем через DataBindings,
         // потому что ComboBox хранит строку ".cs",
         // а ScannerSetting.SearchPattern хранит enum PatternType.
         // cboSearchPatterns.DataBindings.Add(...) здесь быть не должно.
-
         cboDRY_RUN.DataBindings.Add(
             "SelectedIndex",
             bsFileScanner,
             nameof(ScannerSetting.DryRunIndex),
             true,
             DataSourceUpdateMode.OnPropertyChanged);
-
         btnBegin.DataBindings.Add(
             "Enabled",
             bsFileScanner,
             nameof(ScannerSetting.BeginEnabled),
             true,
             DataSourceUpdateMode.Never);
-
         btnCancel.DataBindings.Add(
             "Enabled",
             bsFileScanner,
             nameof(ScannerSetting.CancelEnabled),
             true,
             DataSourceUpdateMode.Never);
-
         btnSave.DataBindings.Add(
             "Enabled",
             bsFileScanner,
             nameof(ScannerSetting.SaveEnabled),
             true,
             DataSourceUpdateMode.Never);
-
         progressBar.Properties.Maximum = Math.Max(1, _store.ProgressMaximum);
-
         _store.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName != nameof(ScannerSetting.ProgressMaximum)
@@ -138,54 +121,40 @@ namespace AppCleaner;
             {
                 return;
             }
-
             SafeInvoke(UpdateProgressMaximum);
         };
     }
     private void InitializeComboBoxes()
     {
         RefreshPathComboBoxes();
-
         cboSearchPatterns.Properties.Items.Clear();
-
         cboSearchPatterns.Properties.Items.AddRange(
             Enum.GetValues<PatternType>()
                 .Select(x => x.GetDisplayName())
                 .ToArray());
-
         SetSelectedPatternFromStore();
-
         cboSelectToDo.Properties.Items.Clear();
         _todoItems.Clear();
-
         foreach (ComboToDoItems item in Enum.GetValues<ComboToDoItems>())
         {
             _todoItems.Add(item);
-
             var attr = item.GetAttribute<ComboItemAttribute>();
-
             cboSelectToDo.Properties.Items.Add(
                 attr?.Name ?? item.ToString());
         }
-
         SetSelectedTodoFromStore();
-
         cboNET.Properties.Items.Clear();
         _netItems.Clear();
-
         foreach (ComboNetItems item in Enum.GetValues<ComboNetItems>())
         {
             _netItems.Add(item);
-
             cboNET.Properties.Items.Add(GetDisplayName(item));
         }
-
         SetSelectedNetFromStore();
     }
     private void SetSelectedPatternFromStore()
     {
         _suppressPatternEditValueChanged = true;
-
         try
         {
             cboSearchPatterns.EditValue = _store.SearchPattern.GetDisplayName();
@@ -200,7 +169,7 @@ namespace AppCleaner;
         return Enum.GetValues(typeof(PatternType))
         .Cast<PatternType>()
         .Select(x => x.GetDisplayName())
-        .ToArray();        
+        .ToArray();
     }
     private ComboNetItems GetNetBySelectedIndex()
     {
@@ -242,17 +211,14 @@ namespace AppCleaner;
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(x => x)
             .ToList();
-
         var pathes = _store.Pathes.ToArray();
-
         cboSearchFolder.Properties.Items.Clear();
         cboSearchFolder.Properties.Items.AddRange(pathes);
-
         cboPlaceFolder.Properties.Items.Clear();
         cboPlaceFolder.Properties.Items.AddRange(pathes);
-
         cboBakFolder.Properties.Items.Clear();
         cboBakFolder.Properties.Items.AddRange(pathes);
+        cboBakFolder.EditValue = _store.BakFolder;
     }
     private static bool IsValidPath(string path)
     {
@@ -260,13 +226,10 @@ namespace AppCleaner;
         {
             if (string.IsNullOrWhiteSpace(path))
                 return false;
-
             if (Directory.Exists(path))
                 return true;
-
             if (File.Exists(path))
                 return true;
-
             return false;
         }
         catch
@@ -290,7 +253,6 @@ namespace AppCleaner;
         if (!ValidateSelected())
             return;
         SaveCurrentUiStateToStore();
-
         _store.SetCurrentActionValues(_todoType, cboSearchFolder.Text, cboPlaceFolder.Text);
         _store.SaveToIni();
         BeginOperation();
@@ -317,15 +279,16 @@ namespace AppCleaner;
     private void SaveCurrentUiStateToStore()
     {
         UpdatePathsFromEditor();
+        _store.BakFolder = cboBakFolder.EditValue?.ToString() ?? string.Empty;
         _store.AddPathes(cboSearchFolder.EditValue?.ToString());
         _store.AddPathes(cboPlaceFolder.EditValue?.ToString());
+        _store.AddPathes(cboBakFolder.EditValue?.ToString());
     }
     public void Cancel()
     {
         _operationCts?.Cancel();
         _store.RefreshCommandStates();
     }
-
     private CancellationToken CurrentToken => _operationCts?.Token ?? CancellationToken.None;
     private void BeginOperation()
     {
@@ -398,17 +361,14 @@ namespace AppCleaner;
     private ComboToDoItems GetTodoBySelectedIndex()
     {
         var index = cboSelectToDo.SelectedIndex;
-
         if (index < 0 || index >= _todoItems.Count)
             return ComboToDoItems.DeleteEmpty;
-
         return _todoItems[index];
     }
     private void SetSelectedTodoFromStore()
     {
         if (_store.SelectedActionIndex < 0 || _store.SelectedActionIndex >= _todoItems.Count)
             _store.SelectedActionIndex = 0;
-
         cboSelectToDo.SelectedIndex = _store.SelectedActionIndex;
     }
     private void LogOperationHeader()
@@ -436,7 +396,6 @@ namespace AppCleaner;
     {
         if (_suppressPatternEditValueChanged)
             return;
-
         _store.SearchPattern =
             PatternTypeExtensions.FromDisplayName(
                 cboSearchPatterns.EditValue?.ToString());
@@ -446,23 +405,17 @@ namespace AppCleaner;
     {
         if (cboSelectToDo.SelectedIndex < 0 || cboSelectToDo.SelectedIndex >= _todoItems.Count)
             return;
-
         _store.SelectedActionIndex = cboSelectToDo.SelectedIndex;
-
         _todoType = GetTodoBySelectedIndex();
-
         var attr = _todoType.GetAttribute<ComboItemAttribute>();
-
         if (attr != null)
         {
             _store.SearchPattern = attr.Pattern;
             SetSelectedPatternFromStore();
         }
-
         UpdatePathFilters(_todoType);
         SetupLayouts();
         SyncPathEditorFromStore();
-
         _store.RefreshCommandStates();
         RefreshUi();
     }
@@ -470,14 +423,12 @@ namespace AppCleaner;
     {
         FillCombo(cboSearchFolder, _store.GetPathes(action, true));
         FillCombo(cboPlaceFolder, _store.GetPathes(action, false));
-
         cboSearchFolder.Text = _store.GetSearchValue(action) ?? string.Empty;
         cboPlaceFolder.Text = _store.GetPlaceValue(action) ?? string.Empty;
     }
     private static void FillCombo(ComboBoxEdit combo, string[] items)
     {
         combo.Properties.Items.BeginUpdate();
-
         try
         {
             combo.Properties.Items.Clear();
@@ -618,38 +569,30 @@ namespace AppCleaner;
     private void SetupLayouts()
     {
         var attr = TodoType.GetAttribute<ComboItemAttribute>();
-
         bool isProcessFiles = attr?.OperationTypes == OperationTypes.ProcessFiles;
         bool isFindReplace = TodoType == ComboToDoItems.FindAndReplace;
         bool isFindAdd = TodoType == ComboToDoItems.FindValueOrClassAddScaveToProject;
         bool isSync = TodoType is ComboToDoItems.SyncProjectFileWithSample or ComboToDoItems.RestoreMissingUsings;
         bool isConvert = TodoType == ComboToDoItems.ConvertOldCsprojToSdkStyle;
         bool isProjectMode = isFindAdd || isSync || isConvert;
-        
-
         SetVisibility(lgFolders, isProcessFiles);
         SetVisibility(lcPlaceFolder, isFindAdd || isSync);
         SetVisibility(lcBakFolder, isProcessFiles);
-
         SetVisibility(lgOptions, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
-
         lcSearchFolder.Text = attr?.SearchLabel ?? "Cканировать папку:";
         lcPlaceFolder.Text = attr?.PlaceLabel ?? "Папка для найденного:";
-
         SetVisibility(lcNetVersion, isConvert);
         SetVisibility(emptySearchExt, !isProjectMode);
         SetVisibility(lcSearchMask, !isProjectMode);
         SetVisibility(lcDRY_RUN, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
         SetVisibility(lcFind, isFindReplace || isFindAdd);
         SetVisibility(lcReplace, isFindReplace);
-        
         cboSearchFolder.Properties.NullValuePrompt =
             isConvert
                 ? "Установите старый файл проекта..."
                 : isProjectMode
                     ? "Установите файл проекта для сравнения..."
                     : "Установите папку для сканирования...";
-
         cboPlaceFolder.Properties.NullValuePrompt =
             isConvert
                 ? "Установите путь нового SDK-style проекта..."
@@ -759,5 +702,10 @@ namespace AppCleaner;
             UseShellExecute = true
         });
     }
-
+    private void cboBakFolder_EditValueChanged(object sender, EventArgs e)
+    {
+        _store.BakFolder = cboBakFolder.EditValue?.ToString() ?? string.Empty;
+        _store.AddPathes(_store.BakFolder);
+        _store.RefreshCommandStates();
+    }
 }

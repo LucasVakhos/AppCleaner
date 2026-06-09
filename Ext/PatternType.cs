@@ -1,6 +1,5 @@
 #nullable disable
 using System.ComponentModel.DataAnnotations;
-
 namespace AppCleaner
 {
     public enum PatternType

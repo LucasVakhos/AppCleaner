@@ -114,7 +114,6 @@ namespace AppCleaner;
         return true;
     }
     #endregion
-
     #region Project sync
     private void SyncProjectFileWithSample(CancellationToken cancellationToken)
     {
@@ -189,7 +188,6 @@ namespace AppCleaner;
                 new XAttribute("Exclude", @"bin\**;obj\**;Actions\**;DataSources\**")));
     }
     #endregion
-
     #region Project convert
     private void ConvertOldCsprojToSdkStyle(string csprojPath, ComboNetItems netVersion)
     {
@@ -364,28 +362,20 @@ namespace AppCleaner;
         //        new XElement("Delete",
         //            new XAttribute("Files", "@(FilesToDelete)"))
         //    ));
-
         newDoc.Root!.Add(
             new XElement("Target",
                 new XAttribute("Name", "CopyFilesToLibs"),
                 new XAttribute("AfterTargets", "Build"),
-
                 new XComment(@"
  временно
-
  <ItemGroup>
      <DllFiles Include=""$(OutputPath)*.dll"" Exclude=""$(OutputPath)$(AssemblyName).dll"" />
  </ItemGroup>
-
  <Message Text=""Найденные DLL для перемещения: @(DllFiles)"" Importance=""high"" />
-
  <MakeDir Directories=""$(OutputPath)Libs"" />
-
  <Move SourceFiles=""@(DllFiles)"" DestinationFolder=""$(OutputPath)Libs"" />
-
  <Exec Command=""powershell -Command ""$exclude = @('libs', 'ru', 'runtimes'); Get-ChildItem '$(OutputPath)' -Directory | Where-Object { $exclude -notcontains $_.Name } | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"""" />
 "),
-
                 new XElement("Exec",
                     new XAttribute(
                         "Command",
@@ -478,7 +468,6 @@ namespace AppCleaner;
                ?? defaultValue;
     }
     #endregion
-
     #region Compile helpers
     private static IEnumerable<(string Path, XElement Element)> GetConcreteCompileItems(
         XDocument doc,
@@ -495,7 +484,6 @@ namespace AppCleaner;
             .Where(x => IsConcreteCsFile(x.Path))
             .Select(x => (x.Path!, x.Element));
     }
-
     private static IEnumerable<(string Path, XElement Element)> GetCompileItems(XDocument doc, XNamespace ns)
     {
         return doc
@@ -540,7 +528,6 @@ namespace AppCleaner;
             && !path.Contains('?');
     }
     #endregion
-
     #region Common helpers
     private void EnsureDefaultTokenIfNeeded()
     {
@@ -550,7 +537,6 @@ namespace AppCleaner;
         var field = typeof(ComboToDoItems).GetField(selectedAction.ToString());
         if (field is null)
             return;
-        
         var attr = (ComboItemAttribute?)SysAttr.GetCustomAttribute(field, typeof(ComboItemAttribute));
         //var findText = attr.Pattern.
         _store.SearchPattern = (PatternType) attr.Pattern;
@@ -583,7 +569,6 @@ namespace AppCleaner;
         return path;
     }
     #endregion
-
     #region Ignore rules
     private static bool IsDesignerFile(string filePath)
     {
@@ -616,7 +601,6 @@ namespace AppCleaner;
         return false;
     }
     #endregion
-
     #region File helpers
     private static Encoding DetectFileEncoding(string filePath)
     {
@@ -646,43 +630,33 @@ namespace AppCleaner;
             AddToLog("[Ошибка бэкапа] путь к файлу пустой.");
             return;
         }
-
         if (!File.Exists(filePath))
         {
             AddToLog($"[Ошибка бэкапа] файл не найден: {filePath}");
             return;
         }
-
         try
         {
             var backupFolder = _store.PlaceFolder;
-
             if (string.IsNullOrWhiteSpace(backupFolder))
                 backupFolder = Path.GetDirectoryName(filePath) ?? string.Empty;
-
             if (string.IsNullOrWhiteSpace(backupFolder))
             {
                 AddToLog("[Ошибка бэкапа] не указана папка для бэкапов.");
                 return;
             }
-
             Directory.CreateDirectory(backupFolder);
-
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var fileName = Path.GetFileName(filePath);
             var backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.bak");
-
             for (int i = 1; File.Exists(backupFilePath); i++)
             {
                 backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.{i}.bak");
             }
-
             using var source = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             using var destination = new FileStream(backupFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None);
-
             source.CopyTo(destination);
             CopyFileTimestamps(filePath, backupFilePath);
-
             AddToLog($"[Бэкап создан] {backupFilePath}");
         }
         catch (Exception ex)

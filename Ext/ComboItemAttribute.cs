@@ -1,7 +1,6 @@
 #nullable disable
 namespace AppCleaner
 {
-
     public class ComboItemAttribute : Attribute
     {
         public string Name { get; set; } = string.Empty;

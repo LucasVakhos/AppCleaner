@@ -1,7 +1,5 @@
 using System.Runtime.Loader;
-
 namespace AppCleaner;
-
 static class Program
 {
     /// <summary>
@@ -28,7 +26,6 @@ static class Program
             }
             return null;
         };
-
         AppDomain.CurrentDomain.AssemblyResolve += (sender, e) =>
         {
             try
@@ -36,7 +33,6 @@ static class Program
                 var assemblyName = new System.Reflection.AssemblyName(e.Name).Name;
                 var libsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "libs");
                 var assemblyPath = Path.Combine(libsPath, $"{assemblyName}.dll");
-                
                 if (File.Exists(assemblyPath))
                 {
                     return System.Reflection.Assembly.LoadFrom(assemblyPath);
@@ -48,12 +44,9 @@ static class Program
             }
             return null;
         };
-
         // Настройка конфигурации приложения
-
         //Позволяет отслеживать источник. Удалите следующую строку в релизной версии проекта.
         DevExpress.Utils.Localization.XtraLocalizer.EnableTraceSource();
-
         //Раскомментируйте следующую строку в релизной версии.
         //DevExpress.Utils.Localization.XtraLocalizer.UserResourceManager = DXLocalization.ResourceManager;
         ApplicationConfiguration.Initialize();

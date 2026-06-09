@@ -2,14 +2,11 @@
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-
 namespace AppCleaner;
-
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class SavedAttribute : Attribute
 {
 }
-
     public sealed class IniFile
 {
     public static string DefaultFilePath =>
@@ -22,7 +19,6 @@ public sealed class SavedAttribute : Attribute
         : this(DefaultFilePath)
     {
     }
-
     public IniFile(string filePath)
     {
         _filePath = filePath;
@@ -42,36 +38,28 @@ public sealed class SavedAttribute : Attribute
             values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             _sections[section] = values;
         }
-
         values[key] = ConvertToIniString(value);
     }
     public void SaveObject(object obj)
     {
         ArgumentNullException.ThrowIfNull(obj);
-
         string section = obj.GetType().Name;
-
         foreach (var property in GetSavedProperties(obj.GetType()))
         {
             var value = property.GetValue(obj);
-
             if (value is Dictionary<ComboToDoItems, ActionSettings> settings)
             {
                 SaveActionSettings(property.Name, settings);
                 continue;
             }
-
             Write(section, property.Name, value);
         }
-
         Save();
     }
     public void LoadObject(object obj)
     {
         ArgumentNullException.ThrowIfNull(obj);
-
         string section = obj.GetType().Name;
-
         foreach (var property in GetSavedProperties(obj.GetType()))
         {
             if (property.GetValue(obj) is Dictionary<ComboToDoItems, ActionSettings> settings)
@@ -79,19 +67,14 @@ public sealed class SavedAttribute : Attribute
                 LoadActionSettings(property.Name, settings);
                 continue;
             }
-
             var text = Read(section, property.Name);
-
             if (string.IsNullOrEmpty(text))
                 continue;
-
             try
             {
                 var value = ConvertFromString(text, property.PropertyType);
-
                 if (value is string stringValue && IsPathLikeProperty(property))
                     value = NormalizePathSeparators(stringValue);
-
                 property.SetValue(obj, value);
             }
             catch
@@ -105,7 +88,6 @@ public sealed class SavedAttribute : Attribute
         foreach (var pair in settings)
         {
             string section = $"{propertyName}.{pair.Key}";
-
             Write(section, nameof(ActionSettings.SearchValue), pair.Value.SearchValue);
             Write(section, nameof(ActionSettings.PlaceValue), pair.Value.PlaceValue);
         }
@@ -115,10 +97,8 @@ public sealed class SavedAttribute : Attribute
         foreach (var pair in settings)
         {
             string section = $"{propertyName}.{pair.Key}";
-
             pair.Value.SearchValue =
                 NormalizePathSeparators(Read(section, nameof(ActionSettings.SearchValue)));
-
             pair.Value.PlaceValue =
                 NormalizePathSeparators(Read(section, nameof(ActionSettings.PlaceValue)));
         }
@@ -126,54 +106,40 @@ public sealed class SavedAttribute : Attribute
     public void Save()
     {
         var lines = new List<string>();
-
         foreach (var section in _sections)
         {
             lines.Add($"[{section.Key}]");
-
             foreach (var pair in section.Value)
                 lines.Add($"{pair.Key}={Escape(pair.Value)}");
-
             lines.Add(string.Empty);
         }
-
         File.WriteAllLines(_filePath, lines, Encoding.UTF8);
     }
     private void Load()
     {
         if (!File.Exists(_filePath))
             return;
-
         string currentSection = string.Empty;
-
         foreach (var rawLine in File.ReadAllLines(_filePath, Encoding.UTF8))
         {
             var line = rawLine.Trim();
-
             if (string.IsNullOrWhiteSpace(line))
                 continue;
-
             if (line.StartsWith("[") && line.EndsWith("]"))
             {
                 currentSection = line[1..^1];
-
                 if (!_sections.ContainsKey(currentSection))
                     _sections[currentSection] = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
                 continue;
             }
-
             var parts = line.Split('=', 2);
-
             if (parts.Length != 2)
                 continue;
-
             if (!_sections.TryGetValue(currentSection, out var values))
             {
                 values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 _sections[currentSection] = values;
             }
-
             values[parts[0].Trim()] = Unescape(parts[1]);
         }
     }
@@ -188,7 +154,6 @@ public sealed class SavedAttribute : Attribute
     private static bool IsSupportedIniType(Type type)
     {
         type = Nullable.GetUnderlyingType(type) ?? type;
-
         if (type == typeof(string)
             || type == typeof(int)
             || type == typeof(bool)
@@ -198,19 +163,15 @@ public sealed class SavedAttribute : Attribute
             || type == typeof(List<string>)
             || type.IsEnum)
             return true;
-
         return IsActionSettingsDictionary(type);
     }
     private static bool IsActionSettingsDictionary(Type type)
     {
         if (!type.IsGenericType)
             return false;
-
         if (type.GetGenericTypeDefinition() != typeof(Dictionary<,>))
             return false;
-
         var args = type.GetGenericArguments();
-
         return args[0] == typeof(ComboToDoItems)
             && args[1] == typeof(ActionSettings);
     }
@@ -228,40 +189,30 @@ public sealed class SavedAttribute : Attribute
     {
         var nullableType = Nullable.GetUnderlyingType(targetType);
         var realType = nullableType ?? targetType;
-
         if (nullableType != null && string.IsNullOrWhiteSpace(text))
             return null;
-
         if (realType == typeof(string))
             return text;
-
         if (realType == typeof(List<string>))
             return ParseStringList(text);
-
         if (realType.IsEnum)
         {
             if (realType == typeof(PatternType))
                 return PatternTypeExtensions.FromDisplayName(text);
-
             if (Enum.TryParse(realType, text, true, out var enumValue))
                 return enumValue;
-
             if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var enumIndex))
                 return Enum.ToObject(realType, enumIndex);
-
             return Activator.CreateInstance(realType);
         }
-
         if (realType == typeof(bool))
             return bool.Parse(text);
-
         return Convert.ChangeType(text, realType, CultureInfo.InvariantCulture);
     }
     private static List<string> ParseStringList(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return new List<string>();
-
         if (text.TrimStart().StartsWith("["))
         {
             try
@@ -274,7 +225,6 @@ public sealed class SavedAttribute : Attribute
                 // Если JSON повреждён, пробуем прочитать как обычную строку ниже.
             }
         }
-
         return NormalizeStringList(text.Split('|', StringSplitOptions.RemoveEmptyEntries));
     }
     private static List<string> NormalizeStringList(IEnumerable<string>? values)
@@ -298,15 +248,11 @@ public sealed class SavedAttribute : Attribute
     {
         if (string.IsNullOrWhiteSpace(value))
             return string.Empty;
-
         bool isUnc = value.StartsWith(@"\\");
-
         while (value.Contains(@"\\"))
             value = value.Replace(@"\\", @"\");
-
         if (isUnc && !value.StartsWith(@"\\"))
             value = @"\" + value;
-
         return value;
     }
     public static string Escape(string value)
@@ -323,5 +269,4 @@ public sealed class SavedAttribute : Attribute
             .Replace("%0A", "\n", StringComparison.OrdinalIgnoreCase)
             .Replace("%25", "%", StringComparison.OrdinalIgnoreCase);
     }
-
 }

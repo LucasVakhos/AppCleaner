@@ -259,7 +259,7 @@ namespace AppCleaner
             cboSearchFolder.StyleController = layoutControl;
             cboSearchFolder.TabIndex = 2;
             cboSearchFolder.Tag = "1";
-            cboSearchFolder.EditValueChanged += cboFolder_EditValueChanged;
+            cboSearchFolder.EditValueChanged += cboSearchFolder_EditValueChanged;
             // 
             // foundFolders
             // 
@@ -368,7 +368,7 @@ namespace AppCleaner
             cboBakFolder.Size = new Size(602, 20);
             cboBakFolder.StyleController = layoutControl;
             cboBakFolder.TabIndex = 13;
-            cboBakFolder.EditValueChanged += cboFolder_EditValueChanged;
+            cboBakFolder.EditValueChanged += cboBakFolder_EditValueChanged;
             // 
             // Root
             // 
