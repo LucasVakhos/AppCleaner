@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
+		<ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+		<UseWPF>False</UseWPF>
+		<ApplicationIcon>Icon(8).ico</ApplicationIcon>
+		<NuGetAuditMode>direct</NuGetAuditMode>
+		<AssemblyVersion>1.0.0.1</AssemblyVersion>
+		<!-- Отключаем неявное включение EmbeddedResource и Compile -->
+		<EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<Content Remove="C:\Users\Admin\.nuget\packages\edgesharp.core\0.9.0\contentFiles\any\net5.0\WebView2Loader.dll" />
+		<Content Remove="C:\Users\user\.nuget\packages\edgesharp.core\0.9.0\contentFiles\any\net5.0\WebView2Loader.dll" />
+	</ItemGroup>
+
+	<!-- Явное включение всех EmbeddedResource -->
+	<ItemGroup>
+		<EmbeddedResource Include="Classes\FileScanner.resx" />
+		<EmbeddedResource Include="MainForm.resx" />
+	</ItemGroup>
+
+	<!-- Явное включение всех Compile -->
+	<ItemGroup>
+		<Compile Include="Classes\ActionSettings.cs" />
+		<Compile Include="Classes\FileScanner.cs" />
+		<Compile Include="Classes\FileScanner.Designer.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessFilePathComments.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+
+		<Compile Include="Classes\FileScanner.RecoveryMissingUsings.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessFindAndCopyFiles.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessNamespaces.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessNormalizeMethods.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessOtherFiles.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessRestoreBackup.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessScanFiles.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessTranslate.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessUsingPackages.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\FileScanner.ProcessUtils.cs">
+			<DependentUpon>FileScanner.cs</DependentUpon>
+		</Compile>
+		<Compile Include="Classes\IniFile.cs" />
+		<Compile Include="Classes\MainFormState.cs" />
+		<Compile Include="Ext\PathFilterType.cs" />
+		<Compile Include="Classes\ScannerSetting.cs" />
+		<Compile Include="Ext\ComboItemAttribute.cs" />
+		<Compile Include="Ext\ComboNetItems.cs" />
+		<Compile Include="Ext\ComboNetItemsExtensions.cs" />
+		<Compile Include="Ext\ComboToDoItems.cs" />
+		<Compile Include="Ext\ComponentExtension.cs" />
+		<Compile Include="Ext\ControlExtensions.cs" />
+		<Compile Include="Ext\CountersHelpers.cs" />
+		<Compile Include="Ext\EnumClassExtension.cs" />
+		<Compile Include="Ext\FilePathExtensions.cs" />
+		<Compile Include="Ext\FormIniExtension.cs" />
+		<Compile Include="Ext\OperationTypes.cs" />
+		<Compile Include="Ext\PathesAttribute.cs" />
+		<Compile Include="Ext\PatternType.cs" />
+		<Compile Include="Ext\PatternTypeExtensions.cs" />
+		<Compile Include="Ext\RussianStringValidator.cs" />
+		<Compile Include="Ext\StringHelpers.cs" />
+		<Compile Include="MainForm.cs" />
+		<Compile Include="MainForm.Designer.cs" />
+		<Compile Include="Program.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Icon(8).ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="DevExpress.CodeParser" Version="25.2.7" />
+		<PackageReference Include="DevExpress.Data" Version="25.2.7" />
+		<PackageReference Include="DevExpress.Win.Design" Version="25.2.7" />
+		<PackageReference Include="EdgeSharp.Core" Version="0.9.0" />
+		<PackageReference Include="GTranslate" Version="2.3.1" />
+		<PackageReference Include="log4net" Version="3.3.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+		<PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="App.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<Target Name="CopyLibsAfterBuild" AfterTargets="Build">
+		<!-- Создаём папку libs -->
+		<MakeDir Directories="$(OutputPath)libs" />
+		
+		<!-- Копируем DLL в папку libs и оставляем все зависимости рядом с exe -->
+		<ItemGroup>
+			<AllDlls Include="$(OutputPath)*.dll" Exclude="$(OutputPath)AppCleaner.dll" />
+		</ItemGroup>
+		
+		<!-- Копируем DLL в libs, не удаляя их из корня -->
+		<Copy SourceFiles="@(AllDlls)" DestinationFolder="$(OutputPath)libs" />
+		
+		<!-- Удаляем пустые папки (кроме libs, ru, runtimes) -->
+		<Exec Command="powershell -NoProfile -Command &quot;$exclude = @('libs', 'ru', 'runtimes'); Get-ChildItem '$(OutputPath)' -Directory -ErrorAction SilentlyContinue | Where-Object { $exclude -notcontains $_.Name } | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue&quot;" />
+		
+		<Message Text="✓ DLL перемещены в папку libs, exe будет загружать их оттуда" Importance="high" />
+	</Target>
+</Project>
