@@ -8,9 +8,8 @@ namespace AppCleaner
     public partial class FileScanner
     {
         private readonly YandexTranslator _translator = new();
-        private const string textExt = ".txt";
-
-        private async Task TranslateEnToRuFolderAsync(CancellationToken cancellationToken)
+    private const string textExt = ".txt";
+    private async Task TranslateEnToRuFolderAsync(CancellationToken cancellationToken)
         {
             var files = Directory
                 .EnumerateFiles(_store.SearchFolder, "*.*", SearchOption.AllDirectories)
@@ -53,8 +52,7 @@ namespace AppCleaner
 
             AddToLog("Перевод завершён.");
         }
-
-        private async Task<bool> TranslateFileAsync(string filePath, CancellationToken cancellationToken)
+    private async Task<bool> TranslateFileAsync(string filePath, CancellationToken cancellationToken)
         {
             var encoding = DetectFileEncoding(filePath);
             var source = await File.ReadAllTextAsync(filePath, encoding, cancellationToken);
@@ -84,23 +82,19 @@ namespace AppCleaner
 
             return true;
         }
-
-        private static bool IsText(string filePath)
+    private static bool IsText(string filePath)
         {
             return Path.GetExtension(filePath).Equals(textExt, StringComparison.OrdinalIgnoreCase);
         }
-
-        private static bool IsCSharp(string filePath)
+    private static bool IsCSharp(string filePath)
         {
             return Path.GetExtension(filePath).Equals(".cs", StringComparison.OrdinalIgnoreCase);
         }
-
-        private async Task<string> TranslateTextAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateTextAsync(string source, CancellationToken cancellationToken)
         {
             return await TranslateAsync(source, cancellationToken);
         }
-
-        private async Task<string> TranslateRazorAttributesAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateRazorAttributesAsync(string source, CancellationToken cancellationToken)
         {
             var regex = new Regex(
                 @"(?<name>\b(?:Text|LabelText|Caption|Title|Placeholder|NullText|ErrorMessage|Message)\s*=\s*"")(?<text>[^""@{}<>]*[A-Za-z][^""{}<>]*)(?<end>"")",
@@ -108,8 +102,7 @@ namespace AppCleaner
 
             return await ReplaceMatchesAsync(source, regex, "text", cancellationToken);
         }
-
-        private async Task<string> TranslateTagTextAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateTagTextAsync(string source, CancellationToken cancellationToken)
         {
             var regex = new Regex(
                 @"(?<=>)(?<text>[^<>]*[A-Za-z][^<>]*)(?=<)",
@@ -117,8 +110,7 @@ namespace AppCleaner
 
             return await ReplaceMatchesAsync(source, regex, "text", cancellationToken);
         }
-
-        private async Task<string> TranslateCSharpStringLiteralsAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateCSharpStringLiteralsAsync(string source, CancellationToken cancellationToken)
         {
             var regex = new Regex(
                 @"(?<prefix>(?:ErrorMessage|Name|Message|Title|Description|DisplayName)\s*=\s*""|throw\s+new\s+\w+Exception\s*\(\s*""|message\s*=\s*"")(?<text>(?:\\""|[^""])*[A-Za-z](?:\\""|[^""])*)(?<end>"")",
@@ -126,8 +118,7 @@ namespace AppCleaner
 
             return await ReplaceMatchesAsync(source, regex, "text", cancellationToken);
         }
-
-        private async Task<string> TranslateCSharpCommentsAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateCSharpCommentsAsync(string source, CancellationToken cancellationToken)
         {
             source = await TranslateXmlDocCommentsAsync(source, cancellationToken);
             source = await TranslateSlashCommentsAsync(source, cancellationToken);
@@ -135,8 +126,7 @@ namespace AppCleaner
 
             return source;
         }
-
-        private async Task<string> TranslateXmlDocCommentsAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateXmlDocCommentsAsync(string source, CancellationToken cancellationToken)
         {
             var regex = new Regex(
                 @"(?<prefix>^[ \t]*///\s?)(?<text>[A-Za-z][^\r\n]*)",
@@ -144,8 +134,7 @@ namespace AppCleaner
 
             return await ReplaceMatchesAsync(source, regex, "text", cancellationToken);
         }
-
-        private async Task<string> TranslateSlashCommentsAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateSlashCommentsAsync(string source, CancellationToken cancellationToken)
         {
             var regex = new Regex(
                 @"(?<prefix>^[ \t]*//\s?)(?<text>[A-Za-z][^\r\n]*)",
@@ -153,8 +142,7 @@ namespace AppCleaner
 
             return await ReplaceMatchesAsync(source, regex, "text", cancellationToken);
         }
-
-        private async Task<string> TranslateBlockCommentsAsync(string source, CancellationToken cancellationToken)
+    private async Task<string> TranslateBlockCommentsAsync(string source, CancellationToken cancellationToken)
         {
             var regex = new Regex(
                 @"(?<prefix>/\*)(?<text>[\s\S]*?[A-Za-z][\s\S]*?)(?<end>\*/)",
@@ -162,8 +150,7 @@ namespace AppCleaner
 
             return await ReplaceMatchesAsync(source, regex, "text", cancellationToken);
         }
-
-        private async Task<string> ReplaceMatchesAsync(string source, Regex regex, string groupName, CancellationToken cancellationToken)
+    private async Task<string> ReplaceMatchesAsync(string source, Regex regex, string groupName, CancellationToken cancellationToken)
         {
             var result = new StringBuilder();
             var lastIndex = 0;
@@ -201,8 +188,7 @@ namespace AppCleaner
             result.Append(source, lastIndex, source.Length - lastIndex);
             return result.ToString();
         }
-
-        private async Task<string> TranslateAsync(string phrase, CancellationToken cancellationToken)
+    private async Task<string> TranslateAsync(string phrase, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -215,8 +201,7 @@ namespace AppCleaner
 
             return NormalizeTranslation(result.Translation);
         }
-
-        private static string NormalizeTranslation(string text)
+    private static string NormalizeTranslation(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 return text;
@@ -229,8 +214,7 @@ namespace AppCleaner
 
             return text;
         }
-
-        private static bool ShouldTranslateText(string text)
+    private static bool ShouldTranslateText(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 return false;

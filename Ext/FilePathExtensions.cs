@@ -10,7 +10,7 @@ namespace AppCleaner
         /// <param name="filePath">Путь к файлу.</param>
         /// <param name="fallback">Если не удалось определить — возвращаем эту кодировку (по умолчанию CP1251 в Windows).</param>
         /// <param name="maxBytesForHeuristics">Сколько байт читать для эвристики (по умолчанию 4096).</param>
-        public static Encoding DetectEncodingFromBomOrHeuristic(this string filePath, Encoding fallback = null, int maxBytesForHeuristics = 4096)
+    public static Encoding DetectEncodingFromBomOrHeuristic(this string filePath, Encoding fallback = null, int maxBytesForHeuristics = 4096)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentNullException(nameof(filePath));
@@ -59,7 +59,7 @@ namespace AppCleaner
             return fallback;
         }
         // Простая проверка валидности UTF-8 (не делает никаких проб и ошибок, только проверяет корректность байт-последовательностей)
-        private static bool IsValidUtf8(byte[] bytes, int count)
+    private static bool IsValidUtf8(byte[] bytes, int count)
         {
             int i = 0;
             while (i < count)
@@ -91,7 +91,7 @@ namespace AppCleaner
             }
             return true;
         }
-        private static Encoding GetDefaultAnsiEncoding()
+    private static Encoding GetDefaultAnsiEncoding()
         {
             // В Windows обычно CP1251 для русскоязычных систем; Encoding.Default может отличаться по платформе.
             try

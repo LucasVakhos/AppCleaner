@@ -6,30 +6,30 @@ namespace AppCleaner.Ext
     public static class CountersHelpers
     {
         private static readonly string _logFilePath = Path.Combine(Application.StartupPath, "namespaces_collect.log.txt");
-        private static readonly object _logFileLock = new object();
-        private static int _foldersProcessed;
-        private static int _filesProcessed;
-        private static ConcurrentDictionary<string, int> _processedFolders = new ConcurrentDictionary<string, int>();
-        public static int FilesProcessed => Volatile.Read(ref _filesProcessed);
-        public static int FoldersProcessed => Volatile.Read(ref _foldersProcessed);
-        internal static void Reset()
+    private static readonly object _logFileLock = new object();
+    private static int _foldersProcessed;
+    private static int _filesProcessed;
+    private static ConcurrentDictionary<string, int> _processedFolders = new ConcurrentDictionary<string, int>();
+    public static int FilesProcessed => Volatile.Read(ref _filesProcessed);
+    public static int FoldersProcessed => Volatile.Read(ref _foldersProcessed);
+    internal static void Reset()
         {
             _foldersProcessed = 0;
             _filesProcessed = 0;
             _processedFolders.Clear();
         }
-        internal static void IncFiles()
+    internal static void IncFiles()
         {
             Interlocked.Increment(ref _filesProcessed);
         }
-        internal static void IncFolders(string folder)
+    internal static void IncFolders(string folder)
         {
             if (_processedFolders.TryAdd(folder, 0))
             {
                 Interlocked.Increment(ref _foldersProcessed);
             }
         }
-        internal static void AddToLog(string logLine)
+    internal static void AddToLog(string logLine)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace AppCleaner.Ext
             }
             catch { /* игнорируем */ }
         }
-        internal static void ShowLog()
+    internal static void ShowLog()
         {
             // По завершении можно открыть лог (опционально)
             try

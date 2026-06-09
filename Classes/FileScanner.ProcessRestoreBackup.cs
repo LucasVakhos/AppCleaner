@@ -4,7 +4,7 @@ namespace AppCleaner
 {
     public partial class FileScanner
     {
-        private async Task RestoreCSharpFilesFromBakFolderAsync(CancellationToken cancellationToken)
+    private async Task RestoreCSharpFilesFromBakFolderAsync(CancellationToken cancellationToken)
         {
             var backupFiles = Directory
                 .EnumerateFiles(_store.SearchFolder, "*.cs.*.bak", SearchOption.AllDirectories)
@@ -44,8 +44,7 @@ namespace AppCleaner
 
             AddToLog("Восстановление .cs из последнего timestamp .bak завершено.");
         }
-
-        private async Task<bool> RestoreCSharpFileFromBakAsync(string backupFilePath, CancellationToken cancellationToken)
+    private async Task<bool> RestoreCSharpFileFromBakAsync(string backupFilePath, CancellationToken cancellationToken)
         {
             if (!IsTimestampedCSharpBackup(backupFilePath))
                 return false;
@@ -63,8 +62,7 @@ namespace AppCleaner
 
             return true;
         }
-
-        private static bool IsTimestampedCSharpBackup(string filePath)
+    private static bool IsTimestampedCSharpBackup(string filePath)
         {
             var fileName = Path.GetFileName(filePath);
 
@@ -73,8 +71,7 @@ namespace AppCleaner
                 @"^.+\.cs\.\d{8}_\d{6}\.bak$",
                 RegexOptions.IgnoreCase);
         }
-
-        private static string GetTargetFilePathFromTimestampedBak(string backupFilePath)
+    private static string GetTargetFilePathFromTimestampedBak(string backupFilePath)
         {
             return Regex.Replace(
                 backupFilePath,

@@ -5,7 +5,7 @@ namespace AppCleaner
 {
     public partial class FileScanner
     {
-        private async Task NormalizeMethodSignaturesFolderAsync(CancellationToken cancellationToken)
+    private async Task NormalizeMethodSignaturesFolderAsync(CancellationToken cancellationToken)
         {
             var files = Directory
                 .EnumerateFiles(_store.SearchFolder, "*.cs", SearchOption.AllDirectories)
@@ -42,8 +42,7 @@ namespace AppCleaner
 
             AddToLog("Нормализация сигнатур завершена.");
         }
-
-        private async Task<bool> NormalizeMethodSignaturesFileAsync(string filePath, CancellationToken cancellationToken)
+    private async Task<bool> NormalizeMethodSignaturesFileAsync(string filePath, CancellationToken cancellationToken)
         {
             var encoding = DetectFileEncoding(filePath);
             var source = await File.ReadAllTextAsync(filePath, encoding, cancellationToken);
@@ -59,8 +58,7 @@ namespace AppCleaner
 
             return true;
         }
-
-        private static string FixCollapsedCSharpMembers(string source)
+    private static string FixCollapsedCSharpMembers(string source)
         {
             var newline = GetNewLine(source);
 
@@ -84,8 +82,7 @@ namespace AppCleaner
 
             return source;
         }
-
-        private static string NormalizeMethodSignatures(string source)
+    private static string NormalizeMethodSignatures(string source)
         {
             var lines = SplitLines(source);
             var result = new StringBuilder();
@@ -131,8 +128,7 @@ namespace AppCleaner
 
             return result.ToString();
         }
-
-        private static List<string> SplitLines(string source)
+    private static List<string> SplitLines(string source)
         {
             var matches = Regex.Matches(source, @".*?(?:\r\n|\n|\r|$)", RegexOptions.Singleline);
 
@@ -141,8 +137,7 @@ namespace AppCleaner
                 .Where(value => value.Length > 0)
                 .ToList();
         }
-
-        private static bool IsMethodSignatureStart(string line)
+    private static bool IsMethodSignatureStart(string line)
         {
             var value = line.TrimStart();
 
@@ -168,8 +163,7 @@ namespace AppCleaner
                 value,
                 @"^(public|private|protected|internal)(\s+(static|virtual|override|abstract|async|sealed|extern|unsafe|new|partial))*\s+[\w<>\[\],?.]+\s+[A-Za-z_][A-Za-z0-9_]*\s*\(");
         }
-
-        private static bool IsRealMultilineMethodSignature(string signature)
+    private static bool IsRealMultilineMethodSignature(string signature)
         {
             var value = Regex.Replace(signature.Trim(), @"\s+", " ");
 
@@ -189,8 +183,7 @@ namespace AppCleaner
                 value,
                 @"^(public|private|protected|internal)(\s+(static|virtual|override|abstract|async|sealed|extern|unsafe|new|partial))*\s+[\w<>\[\],?.]+\s+[A-Za-z_][A-Za-z0-9_]*\s*\(.*\)\s*\{$");
         }
-
-        private static bool IsUnsafeSignatureLine(string line)
+    private static bool IsUnsafeSignatureLine(string line)
         {
             var value = line.Trim();
 
@@ -205,8 +198,7 @@ namespace AppCleaner
 
             return false;
         }
-
-        private static string NormalizeSignatureToSingleLine(string signature)
+    private static string NormalizeSignatureToSingleLine(string signature)
         {
             var newline = GetNewLine(signature);
             var indent = Regex.Match(signature, @"^[ \t]*").Value;
@@ -223,8 +215,7 @@ namespace AppCleaner
 
             return $"{indent}{signature}{newline}{indent}{{{newline}";
         }
-
-        private static string GetNewLine(string value)
+    private static string GetNewLine(string value)
         {
             if (value.Contains("\r\n", StringComparison.Ordinal))
                 return "\r\n";
@@ -237,8 +228,7 @@ namespace AppCleaner
 
             return Environment.NewLine;
         }
-
-        private static int CountCharIgnoringStrings(string value, char target)
+    private static int CountCharIgnoringStrings(string value, char target)
         {
             var count = 0;
             var inString = false;

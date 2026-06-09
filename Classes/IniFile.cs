@@ -10,17 +10,14 @@ public sealed class SavedAttribute : Attribute
 {
 }
 
-public sealed class IniFile
+    public sealed class IniFile
 {
     public static string DefaultFilePath =>
         Path.Combine(
             AppContext.BaseDirectory,
             $"{Path.GetFileNameWithoutExtension(Application.ExecutablePath)}.ini");
-
     private readonly string _filePath;
-
     private readonly Dictionary<string, Dictionary<string, string>> _sections = new(StringComparer.OrdinalIgnoreCase);
-
     public IniFile()
         : this(DefaultFilePath)
     {
@@ -31,7 +28,6 @@ public sealed class IniFile
         _filePath = filePath;
         Load();
     }
-
     public string Read(string section, string key, string defaultValue = "")
     {
         return _sections.TryGetValue(section, out var values) &&
@@ -39,7 +35,6 @@ public sealed class IniFile
             ? value
             : defaultValue;
     }
-
     public void Write(string section, string key, object? value)
     {
         if (!_sections.TryGetValue(section, out var values))
@@ -50,7 +45,6 @@ public sealed class IniFile
 
         values[key] = ConvertToIniString(value);
     }
-
     public void SaveObject(object obj)
     {
         ArgumentNullException.ThrowIfNull(obj);
@@ -72,7 +66,6 @@ public sealed class IniFile
 
         Save();
     }
-
     public void LoadObject(object obj)
     {
         ArgumentNullException.ThrowIfNull(obj);
@@ -107,7 +100,6 @@ public sealed class IniFile
             }
         }
     }
-
     public void SaveActionSettings(string propertyName, Dictionary<ComboToDoItems, ActionSettings> settings)
     {
         foreach (var pair in settings)
@@ -118,7 +110,6 @@ public sealed class IniFile
             Write(section, nameof(ActionSettings.PlaceValue), pair.Value.PlaceValue);
         }
     }
-
     public void LoadActionSettings(string propertyName, Dictionary<ComboToDoItems, ActionSettings> settings)
     {
         foreach (var pair in settings)
@@ -132,7 +123,6 @@ public sealed class IniFile
                 NormalizePathSeparators(Read(section, nameof(ActionSettings.PlaceValue)));
         }
     }
-
     public void Save()
     {
         var lines = new List<string>();
@@ -149,7 +139,6 @@ public sealed class IniFile
 
         File.WriteAllLines(_filePath, lines, Encoding.UTF8);
     }
-
     private void Load()
     {
         if (!File.Exists(_filePath))
@@ -188,7 +177,6 @@ public sealed class IniFile
             values[parts[0].Trim()] = Unescape(parts[1]);
         }
     }
-
     private static IEnumerable<PropertyInfo> GetSavedProperties(Type type)
     {
         return type
@@ -197,7 +185,6 @@ public sealed class IniFile
             .Where(x => x.GetCustomAttribute<SavedAttribute>() is not null)
             .Where(x => IsSupportedIniType(x.PropertyType));
     }
-
     private static bool IsSupportedIniType(Type type)
     {
         type = Nullable.GetUnderlyingType(type) ?? type;
@@ -214,7 +201,6 @@ public sealed class IniFile
 
         return IsActionSettingsDictionary(type);
     }
-
     private static bool IsActionSettingsDictionary(Type type)
     {
         if (!type.IsGenericType)
@@ -228,7 +214,6 @@ public sealed class IniFile
         return args[0] == typeof(ComboToDoItems)
             && args[1] == typeof(ActionSettings);
     }
-
     private static string ConvertToIniString(object? value)
     {
         return value switch
@@ -239,7 +224,6 @@ public sealed class IniFile
             _ => value.ToString() ?? string.Empty
         };
     }
-
     private static object? ConvertFromString(string text, Type targetType)
     {
         var nullableType = Nullable.GetUnderlyingType(targetType);
@@ -273,7 +257,6 @@ public sealed class IniFile
 
         return Convert.ChangeType(text, realType, CultureInfo.InvariantCulture);
     }
-
     private static List<string> ParseStringList(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -294,7 +277,6 @@ public sealed class IniFile
 
         return NormalizeStringList(text.Split('|', StringSplitOptions.RemoveEmptyEntries));
     }
-
     private static List<string> NormalizeStringList(IEnumerable<string>? values)
     {
         return values?
@@ -304,7 +286,6 @@ public sealed class IniFile
             .ToList()
             ?? new List<string>();
     }
-
     private static bool IsPathLikeProperty(PropertyInfo property)
     {
         return property.Name.Contains("Path", StringComparison.OrdinalIgnoreCase)
@@ -313,7 +294,6 @@ public sealed class IniFile
             || property.Name.Contains("Directory", StringComparison.OrdinalIgnoreCase)
             || property.Name.Contains("Value", StringComparison.OrdinalIgnoreCase);
     }
-
     private static string NormalizePathSeparators(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -329,7 +309,6 @@ public sealed class IniFile
 
         return value;
     }
-
     public static string Escape(string value)
     {
         return value
@@ -337,7 +316,6 @@ public sealed class IniFile
             .Replace("\r", "%0D")
             .Replace("\n", "%0A");
     }
-
     public static string Unescape(string value)
     {
         return value

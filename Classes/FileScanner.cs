@@ -11,8 +11,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text;
 namespace AppCleaner;
-
-public partial class FileScanner : XtraUserControl
+    public partial class FileScanner : XtraUserControl
 {
     private const int UiUpdateIntervalMs = 500;
     private const int BackupMaxAttempts = 10_000;
@@ -43,8 +42,6 @@ public partial class FileScanner : XtraUserControl
     private readonly List<ComboNetItems> _netItems = new();
     private ComboToDoItems TodoType => _todoType;
     private ComboToDoItems _todoType;
-
-
     public FileScanner()
     {
         InitializeComponent();
@@ -176,7 +173,7 @@ public partial class FileScanner : XtraUserControl
         cboNET.Properties.Items.Clear();
         _netItems.Clear();
 
-        foreach (var item in Enum.GetValues<ComboNetItems>())
+        foreach (ComboNetItems item in Enum.GetValues<ComboNetItems>())
         {
             _netItems.Add(item);
 
@@ -205,7 +202,6 @@ public partial class FileScanner : XtraUserControl
         .Select(x => x.GetDisplayName())
         .ToArray();        
     }
-
     private ComboNetItems GetNetBySelectedIndex()
     {
         int index = cboNET.SelectedIndex;
@@ -297,6 +293,7 @@ public partial class FileScanner : XtraUserControl
         _operationCts?.Cancel();
         _store.RefreshCommandStates();
     }
+
     private CancellationToken CurrentToken => _operationCts?.Token ?? CancellationToken.None;
     private void BeginOperation()
     {
@@ -408,26 +405,10 @@ public partial class FileScanner : XtraUserControl
         if (_suppressPatternEditValueChanged)
             return;
 
-        var text = cboSearchPatterns.EditValue?.ToString();
-
-        _store.SearchPattern = PatternTypeExtensions.FromDisplayName(text);
+        _store.SearchPattern =
+            PatternTypeExtensions.FromDisplayName(
+                cboSearchPatterns.EditValue?.ToString());
     }
-    public static PatternType FromDisplayName(string value)
-    {
-        foreach (PatternType pattern in Enum.GetValues(typeof(PatternType)))
-        {
-            if (string.Equals(
-                    pattern.GetAttribute<DisplayAttribute>()?.Name,
-                    value,
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                return pattern;
-            }
-        }
-
-        return PatternType.CS;
-    }
-
     #region UpdatePathFilters
     private void cboSelectToDo_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -440,9 +421,9 @@ public partial class FileScanner : XtraUserControl
 
         var attr = _todoType.GetAttribute<ComboItemAttribute>();
 
-        if (attr?.Pattern != null)
+        if (attr != null)
         {
-            _store.SearchPattern = attr.Pattern.Value;
+            _store.SearchPattern = attr.Pattern;
             SetSelectedPatternFromStore();
         }
 
@@ -481,7 +462,6 @@ public partial class FileScanner : XtraUserControl
         _store.AddPathes(cboSearchFolder.Text);
         _store.RefreshCommandStates();
     }
-
     private void cboPlaceFolder_EditValueChanged(object sender, EventArgs e)
     {
         _store.SetPlaceValue(_todoType, cboPlaceFolder.Text);
@@ -489,7 +469,6 @@ public partial class FileScanner : XtraUserControl
         _store.RefreshCommandStates();
     }
     #endregion
-
     private void cboDRY_RUN_EditValueChanged(object sender, EventArgs e)
     {
         _store.DryRunIndex = cboDRY_RUN.SelectedIndex;
@@ -610,9 +589,10 @@ public partial class FileScanner : XtraUserControl
         _store.RefreshCommandStates();
     }
     private void SetupLayouts()
-    { 
+    {
         var attr = TodoType.GetAttribute<ComboItemAttribute>();
-        bool isProcessFiles = attr.OperationTypes == OperationTypes.ProcessFiles;
+
+        bool isProcessFiles = attr?.OperationTypes == OperationTypes.ProcessFiles;
         bool isFindReplace = TodoType == ComboToDoItems.FindAndReplace;
         bool isFindAdd = TodoType == ComboToDoItems.FindValueOrClassAddScaveToProject;
         bool isSync = TodoType is ComboToDoItems.SyncProjectFileWithSample or ComboToDoItems.RestoreMissingUsings;
@@ -620,23 +600,11 @@ public partial class FileScanner : XtraUserControl
         bool isProjectMode = isFindAdd || isSync || isConvert;
 
         SetVisibility(lgFolders, isProcessFiles);
-        //Установите видимость(lgToDo, isFindReplace || isFindAdd || isConvert);
-        //Установите видимость(lgToDo, isFindReplace || isFindAdd || isConvert);
-
         SetVisibility(lgOptions, TodoType is ComboToDoItems.ClearNameSpace or ComboToDoItems.DeleteNonProjectFiles);
-        
-        cboSearchFolder.Properties.NullValuePrompt = isConvert
-            ? "Установите старый файл проекта..."
-            : isProjectMode
-                ? "Установите файл проекта для сравнения..."
-                : "Установите папку для сканирования...";
-        cboPlaceFolder.Properties.NullValuePrompt = isConvert
-            ? "Установите путь нового SDK-style проекта..."
-            : isSync
-                ? "Установите образец файла проекта..."
-                : "Установите папку куда копировать найденное...";
+
         lcSearchFolder.Text = attr?.SearchLabel ?? "Cканировать папку:";
         lcPlaceFolder.Text = attr?.PlaceLabel ?? "Папка для найденного:";
+
         SetVisibility(lcNetVersion, isConvert);
         SetVisibility(emptySearchExt, !isProjectMode);
         SetVisibility(lcSearchMask, !isProjectMode);
@@ -644,12 +612,20 @@ public partial class FileScanner : XtraUserControl
         SetVisibility(lcFind, isFindReplace || isFindAdd);
         SetVisibility(lcReplace, isFindReplace);
         SetVisibility(lcPlaceFolder, isFindAdd || isSync);
-        cboSearchFolder.Properties.NullValuePrompt = isProjectMode
-            ? "Установите файл проекта для сравнения..."
-            : "Установите папку для сканирования...";
-        cboPlaceFolder.Properties.NullValuePrompt = isSync
-            ? "Установите образец файла проекта..."
-            : "Установите папку куда копировать найденное...";
+
+        cboSearchFolder.Properties.NullValuePrompt =
+            isConvert
+                ? "Установите старый файл проекта..."
+                : isProjectMode
+                    ? "Установите файл проекта для сравнения..."
+                    : "Установите папку для сканирования...";
+
+        cboPlaceFolder.Properties.NullValuePrompt =
+            isConvert
+                ? "Установите путь нового SDK-style проекта..."
+                : isSync
+                    ? "Установите образец файла проекта..."
+                    : "Установите папку куда копировать найденное...";
     }
     private static void SetVisibility(BaseLayoutItem item, bool visible)
     {

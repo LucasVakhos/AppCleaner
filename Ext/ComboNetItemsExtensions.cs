@@ -2,7 +2,7 @@
 {
     public static class ComboNetItemsExtensions
     {
-        public static string ToTargetFramework(this ComboNetItems item)
+    public static string ToTargetFramework(this ComboNetItems item)
         {
             return item switch
             {

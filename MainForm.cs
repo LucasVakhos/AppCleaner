@@ -4,7 +4,7 @@ namespace AppCleaner
     public partial class MainForm : XtraForm
     {
         private FileScanner? fileScanner;
-        public MainForm()
+    public MainForm()
         {
             InitializeComponent();
             // Создаём и добавляем FileScanner только если не в режиме дизайна
@@ -18,12 +18,12 @@ namespace AppCleaner
             };
             this.Controls.Add(fileScanner);
         }
-        protected override void OnLoad(EventArgs e)
+    protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
             this.LoadState();
         }
-        protected override void OnFormClosing(FormClosingEventArgs e)
+    protected override void OnFormClosing(FormClosingEventArgs e)
         {
             this.SaveState();
             base.OnFormClosing(e);

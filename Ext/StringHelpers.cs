@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 namespace AppCleaner;
-
-public static class StringHelpers
+    public static class StringHelpers
 {
     // Компилированный regex для производительности
     private static readonly Regex CollapseSemicolonsRegex =

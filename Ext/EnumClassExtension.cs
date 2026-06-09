@@ -11,13 +11,14 @@ namespace AppCleaner
             // альтернативно: return Enum.GetValues(typeof(TEnum)).Length;
         }
         // Расширение для Type: считать значения по runtime-типу
-        public static int Count(this Type enumType)
+    public static int Count(this Type enumType)
         {
             if (enumType == null) throw new ArgumentNullException(nameof(enumType));
             if (!enumType.IsEnum) throw new ArgumentException("Type must be an enum.", nameof(enumType));
             return Enum.GetNames(enumType).Length;
         }
-        public static TAttribute? GetAttribute<TAttribute>(this Enum value)
+
+    public static TAttribute? GetAttribute<TAttribute>(this Enum value)
             where TAttribute : Attribute
         {
             var field = value.GetType().GetField(value.ToString());
@@ -26,7 +27,8 @@ namespace AppCleaner
                 .Cast<TAttribute>()
                 .FirstOrDefault();
         }
-        public static TValue GetEnumValueByDescription<TEnum, TValue>(
+
+    public static TValue GetEnumValueByDescription<TEnum, TValue>(
             this TEnum enumValue,
             Func<TEnum, string> descriptionSelector)
         {

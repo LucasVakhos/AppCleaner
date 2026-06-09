@@ -5,7 +5,7 @@ namespace AppCleaner
 {
     public partial class FileScanner
     {
-        private void ScanAndProcessFiles(CancellationToken cancellationToken)
+    private void ScanAndProcessFiles(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             // Получаем файлы для операции.
@@ -40,7 +40,7 @@ namespace AppCleaner
         /// 3. рекурсивный поиск .csproj
         /// 4. сама папка
         /// </summary>
-        private List<string> GetScanRoots(string rootFolder, CancellationToken cancellationToken)
+    private List<string> GetScanRoots(string rootFolder, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var slnx = Directory
@@ -70,7 +70,7 @@ namespace AppCleaner
         /// Извлекает проекты из .sln или .slnx.
         /// Возвращает папки проектов, а не сами .csproj.
         /// </summary>
-        private List<string> GetProjectsFromSolutionFile(string solutionFile, CancellationToken cancellationToken)
+    private List<string> GetProjectsFromSolutionFile(string solutionFile, CancellationToken cancellationToken)
         {
             var result = new List<string>();
             if (!File.Exists(solutionFile))
@@ -110,7 +110,7 @@ namespace AppCleaner
         /// Достаёт путь к .csproj из строки .sln/.slnx.
         /// Работает и для классического .sln, и для XML-подобных строк .slnx.
         /// </summary>
-        private static string? ExtractCsprojPath(string line)
+    private static string? ExtractCsprojPath(string line)
         {
             var match = Regex.Match(
                 line,
@@ -124,7 +124,7 @@ namespace AppCleaner
         /// Если решения нет, ищем проекты по папкам.
         /// Важно: если в папке найден .csproj, внутрь этой папки дальше не идём.
         /// </summary>
-        private List<string> GetProjectRootsOrFolders(string rootFolder, CancellationToken cancellationToken)
+    private List<string> GetProjectRootsOrFolders(string rootFolder, CancellationToken cancellationToken)
         {
             var result = new List<string>();
             void Walk(string folder)
@@ -155,7 +155,7 @@ namespace AppCleaner
         /// Исключаем копии и бэкапы проектов,
         /// чтобы файл вроде "NewsMaker — копия.csproj" не перехватывал сканирование.
         /// </summary>
-        private static bool IsIgnoredProject(string path)
+    private static bool IsIgnoredProject(string path)
         {
             var file = Path.GetFileName(path);
             return file.Contains("копия", StringComparison.OrdinalIgnoreCase)
@@ -166,7 +166,7 @@ namespace AppCleaner
         /// Проверяет, можно ли обрабатывать файл.
         /// Исключаем служебные папки сборки и Git.
         /// </summary>
-        private static bool IsAllowedFilePath(string path)
+    private static bool IsAllowedFilePath(string path)
         {
             return !path.Contains(@"\bin\", StringComparison.OrdinalIgnoreCase)
                 && !path.Contains(@"\obj\", StringComparison.OrdinalIgnoreCase)
@@ -176,7 +176,7 @@ namespace AppCleaner
         /// <summary>
         /// Проверяет, нужно ли пропустить папку при рекурсивном обходе.
         /// </summary>
-        private static bool IsIgnoredDirectory(string folder)
+    private static bool IsIgnoredDirectory(string folder)
         {
             var name = Path.GetFileName(folder);
             return name.Equals("bin", StringComparison.OrdinalIgnoreCase)
@@ -184,7 +184,7 @@ namespace AppCleaner
                 || name.Equals(".git", StringComparison.OrdinalIgnoreCase)
                 || name.Equals(".vs", StringComparison.OrdinalIgnoreCase);
         }
-        private bool ProcessFile(string filePath, CancellationToken cancellationToken)
+    private bool ProcessFile(string filePath, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (!File.Exists(filePath))
@@ -234,7 +234,7 @@ namespace AppCleaner
                 CountProcessedFile(filePath);
             }
         }
-        private static string NormalizeEmptyLines(string text)
+    private static string NormalizeEmptyLines(string text)
         {
             var lines = text
                 .Replace("\r\n", "\n")
@@ -274,7 +274,7 @@ namespace AppCleaner
             }
             return string.Join(Environment.NewLine, result);
         }
-        private LineProcessResult ProcessLine(string? line)
+    private LineProcessResult ProcessLine(string? line)
         {
             if (line is null)
                 return new LineProcessResult(string.Empty, false);
@@ -286,7 +286,7 @@ namespace AppCleaner
                 _ => new LineProcessResult(line, false)
             };
         }
-        private LineProcessResult ProcessFindAndReplace(string line)
+    private LineProcessResult ProcessFindAndReplace(string line)
         {
             var find = _store.FindText;
             var replace = _store.ReplaceText;
@@ -297,19 +297,20 @@ namespace AppCleaner
                 ? new LineProcessResult(line, false)
                 : new LineProcessResult(newLine, true);
         }
-        private static LineProcessResult ProcessDeleteRegionRows(string line)
+    private static LineProcessResult ProcessDeleteRegionRows(string line)
         {
             return Regex.IsMatch(line, @"^\s*#(region|endregion)\b.*$")
                 ? new LineProcessResult(string.Empty, true)
                 : new LineProcessResult(line, false);
         }
-        private static LineProcessResult ProcessDeleteEmpty(string line)
+    private static LineProcessResult ProcessDeleteEmpty(string line)
         {
             return string.IsNullOrWhiteSpace(line) ||
                    Regex.IsMatch(line, @"^\s*;+\s*$")
                 ? new LineProcessResult(string.Empty, true)
                 : new LineProcessResult(line, false);
         }
-        private readonly record struct LineProcessResult(string Line, bool Changed);
+
+    private readonly record struct LineProcessResult(string Line, bool Changed);
     }
 }

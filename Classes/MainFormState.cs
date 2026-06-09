@@ -1,6 +1,5 @@
 ﻿namespace AppCleaner.Classes;
-
-public sealed class MainFormState
+    public sealed class MainFormState
 {
     [Saved]
     public int X { get; set; }

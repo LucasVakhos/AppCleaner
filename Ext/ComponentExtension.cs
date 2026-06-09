@@ -5,7 +5,7 @@ namespace AppCleaner
     public static class ComponentExtension
     {
         // Вычисляем режим дизайна динамически
-        public static bool IsDesignMode(this Component component)
+    public static bool IsDesignMode(this Component component)
         {
             if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
                 return true;

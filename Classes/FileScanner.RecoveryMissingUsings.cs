@@ -1,8 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 
 namespace AppCleaner;
-
-public partial class FileScanner
+    public partial class FileScanner
 {
     public void RecoveryMissingUsings(CancellationToken cancellationToken)
     {
@@ -74,7 +73,6 @@ public partial class FileScanner
 
         AddToLog("RecoveryMissingUsings completed.");
     }
-
     private static HashSet<string> GetUsings(string text)
     {
         var matches = Regex.Matches(
@@ -86,7 +84,6 @@ public partial class FileScanner
             .Select(m => m.Value.Trim())
             .ToHashSet(StringComparer.Ordinal);
     }
-
     private static string InsertUsings(string text, List<string> usingsToAdd)
     {
         var lines = text
@@ -114,7 +111,6 @@ public partial class FileScanner
 
         return string.Join(Environment.NewLine, lines);
     }
-
     private static bool IsIgnored(string path)
     {
         return path.Contains(@"\bin\", StringComparison.OrdinalIgnoreCase)

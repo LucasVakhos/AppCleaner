@@ -1,6 +1,5 @@
 ﻿namespace AppCleaner.Ext;
-
-public enum PathFilterType
+    public enum PathFilterType
 {
     Folder,
     Project

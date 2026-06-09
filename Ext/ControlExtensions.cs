@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-public static class ControlExtensions
+    public static class ControlExtensions
 {
     /// <summary>
     /// Рекурсивно ищет первый подходящий для фокуса контрол внутри parent.

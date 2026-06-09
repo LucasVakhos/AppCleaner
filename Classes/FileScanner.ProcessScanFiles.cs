@@ -9,7 +9,7 @@ namespace AppCleaner
         // 1. Если найден .csproj, берём только файлы, которые реально принадлежат проекту.
         // 2. Если .csproj не найден, делаем fallback: безопасно обходим папки рекурсивно.
         // 3. Z.* и служебные папки исключаются всегда.
-        private string[] GetFilesForOperation(string rootFolder, string searchPattern, CancellationToken cancellationToken, bool preferProjectFiles = true, bool includeDesignerFiles = true)
+    private string[] GetFilesForOperation(string rootFolder, string searchPattern, CancellationToken cancellationToken, bool preferProjectFiles = true, bool includeDesignerFiles = true)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (string.IsNullOrWhiteSpace(rootFolder) || !Directory.Exists(rootFolder))
@@ -37,7 +37,7 @@ namespace AppCleaner
         }
         // Ищем .csproj сначала в выбранной папке, потом ниже по дереву.
         // При поиске тоже не заходим в Z.*, bin, obj и прочие исключённые папки.
-        private string? FindProjectFile(string rootFolder, CancellationToken cancellationToken)
+    private string? FindProjectFile(string rootFolder, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -58,7 +58,7 @@ namespace AppCleaner
         // Возвращает физические файлы проекта.
         // Важно: тут не надо blindly сканировать все папки проекта.
         // Мы сначала читаем .csproj и берём только то, что проект реально включает.
-        private IEnumerable<string> GetPhysicalProjectFiles(string projectFile, string searchPattern, CancellationToken cancellationToken)
+    private IEnumerable<string> GetPhysicalProjectFiles(string projectFile, string searchPattern, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var projectDirectory = Path.GetDirectoryName(projectFile);
@@ -86,7 +86,7 @@ namespace AppCleaner
         }
         // Безопасный fallback-обход папок.
         // Используется только если .csproj не найден либо для операций, где проект намеренно не нужен.
-        private IEnumerable<string> EnumerateFilesSafe(string rootFolder, string searchPattern, CancellationToken cancellationToken)
+    private IEnumerable<string> EnumerateFilesSafe(string rootFolder, string searchPattern, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(rootFolder) || !Directory.Exists(rootFolder))
                 yield break;
@@ -135,7 +135,7 @@ namespace AppCleaner
             }
         }
         // Проверка маски файла без лишнего Directory.GetFiles по всему дереву.
-        private static bool FileMatchesPattern(string filePath, string pattern)
+    private static bool FileMatchesPattern(string filePath, string pattern)
         {
             if (string.IsNullOrWhiteSpace(pattern) || pattern == "*")
                 return true;
@@ -145,13 +145,13 @@ namespace AppCleaner
                 .Replace("\\?", ".") + "$";
             return Regex.IsMatch(fileName, regex, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
         }
-        private static bool ContainsWildcard(string path)
+    private static bool ContainsWildcard(string path)
         {
             return path.Contains('*') || path.Contains('?');
         }
         #endregion    }
         #region Delete bak
-        private void DeleteBakFiles(CancellationToken cancellationToken)
+    private void DeleteBakFiles(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             // .bak обычно не входит в .csproj, поэтому тут проектный режим отключён.

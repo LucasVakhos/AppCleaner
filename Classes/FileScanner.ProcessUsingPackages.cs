@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 namespace AppCleaner;
-
-public partial class FileScanner
+    public partial class FileScanner
 {
     private void CollectRequiredPackagesFromUsings(CancellationToken cancellationToken)
     {

@@ -6,7 +6,7 @@ namespace AppCleaner
     public partial class FileScanner
     {
         #region Namespace operations
-        private int NormalizeNamespacesInDirectory(bool dryRun, CancellationToken cancellationToken)
+    private int NormalizeNamespacesInDirectory(bool dryRun, CancellationToken cancellationToken)
         {
             // Раньше нормализатор namespace сканировал все *.cs в подпапках.
             // Теперь он работает только по файлам проекта, если проект найден.
@@ -43,7 +43,7 @@ namespace AppCleaner
             AddToLog($"Namespace-normalizer завершён. Изменено файлов: {changedFiles}");
             return changedFiles;
         }
-        private bool NormalizeNamespacesInFile(string filePath, bool dryRun, CancellationToken cancellationToken)
+    private bool NormalizeNamespacesInFile(string filePath, bool dryRun, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var encoding = DetectFileEncoding(filePath);
@@ -64,7 +64,7 @@ namespace AppCleaner
             AddToLog($"[Обновлено] namespace: {Path.GetFileName(filePath)}");
             return true;
         }
-        private void CollectAllNamespaces(CancellationToken cancellationToken)
+    private void CollectAllNamespaces(CancellationToken cancellationToken)
         {
             // Сбор namespace тоже больше не обходит всё дерево без необходимости.
             var files = GetFilesForOperation(
@@ -98,9 +98,10 @@ namespace AppCleaner
                 ? "Namespace не найдены."
                 : string.Join(Environment.NewLine, namespaces.Select(x => $"{x.Key} : {x.Value}")));
         }
-        private static class NamespaceNormalizer
+
+    private static class NamespaceNormalizer
         {
-            public static string NormalizeSameNamespacePrefixes(string source, out bool changed)
+    public static string NormalizeSameNamespacePrefixes(string source, out bool changed)
             {
                 changed = false;
                 if (string.IsNullOrWhiteSpace(source))
@@ -124,7 +125,7 @@ namespace AppCleaner
                 changed = !string.Equals(source, normalized, StringComparison.Ordinal);
                 return normalized;
             }
-            public static IReadOnlyCollection<string> GetDeclaredNamespaces(string source)
+    public static IReadOnlyCollection<string> GetDeclaredNamespaces(string source)
             {
                 if (string.IsNullOrWhiteSpace(source))
                     return Array.Empty<string>();
@@ -138,22 +139,25 @@ namespace AppCleaner
                     .OrderBy(x => x, StringComparer.Ordinal)
                     .ToArray();
             }
-            private sealed class SameNamespacePrefixRewriter : CSharpSyntaxRewriter
+
+    private sealed class SameNamespacePrefixRewriter : CSharpSyntaxRewriter
             {
                 private readonly IReadOnlyList<string> _namespaces;
-                public SameNamespacePrefixRewriter(IReadOnlyList<string> namespaces)
+    public SameNamespacePrefixRewriter(IReadOnlyList<string> namespaces)
                 {
                     _namespaces = namespaces;
                 }
-                public bool Changed { get; private set; }
-                public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node) => node;
-                public override SyntaxNode? VisitAliasQualifiedName(AliasQualifiedNameSyntax node) => node;
-                public override SyntaxNode? VisitQualifiedName(QualifiedNameSyntax node)
+
+    public bool Changed { get;
+    private set; }
+    public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node) => node;
+    public override SyntaxNode? VisitAliasQualifiedName(AliasQualifiedNameSyntax node) => node;
+    public override SyntaxNode? VisitQualifiedName(QualifiedNameSyntax node)
                 {
                     var visited = (QualifiedNameSyntax?)base.VisitQualifiedName(node) ?? node;
                     return TryShortenName(visited.ToString(), visited) ?? visited;
                 }
-                public override SyntaxNode? VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+    public override SyntaxNode? VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
                 {
                     var visited = (MemberAccessExpressionSyntax?)base.VisitMemberAccessExpression(node) ?? node;
                     var fullName = visited.ToString();
@@ -170,7 +174,7 @@ namespace AppCleaner
                     }
                     return visited;
                 }
-                private SyntaxNode? TryShortenName(string fullName, SyntaxNode originalNode)
+    private SyntaxNode? TryShortenName(string fullName, SyntaxNode originalNode)
                 {
                     foreach (var ns in _namespaces)
                     {
@@ -185,7 +189,7 @@ namespace AppCleaner
                     }
                     return null;
                 }
-                private static bool LooksLikeTypeOrNamespaceName(string value)
+    private static bool LooksLikeTypeOrNamespaceName(string value)
                 {
                     var firstIdentifier = value.Split('.')[0];
                     return firstIdentifier.Length > 0 && char.IsUpper(firstIdentifier[0]);

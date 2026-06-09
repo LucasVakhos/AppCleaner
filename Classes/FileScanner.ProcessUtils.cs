@@ -4,8 +4,7 @@ using System.Text;
 using System.Xml.Linq;
 using SysAttr = System.Attribute;
 namespace AppCleaner;
-
-public partial class FileScanner
+    public partial class FileScanner
 {
     #region Validation
     private bool ValidateSelected()
@@ -496,6 +495,7 @@ public partial class FileScanner
             .Where(x => IsConcreteCsFile(x.Path))
             .Select(x => (x.Path!, x.Element));
     }
+
     private static IEnumerable<(string Path, XElement Element)> GetCompileItems(XDocument doc, XNamespace ns)
     {
         return doc

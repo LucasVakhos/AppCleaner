@@ -8,7 +8,7 @@ namespace AppCleaner
     public partial class FileScanner
     {
         #region Find class and copy to folder
-        private void FindAndAddClassToProject(CancellationToken cancellationToken)
+    private void FindAndAddClassToProject(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var findText = _store.FindText.Trim();
@@ -50,7 +50,7 @@ namespace AppCleaner
             _store.ProgressValue = files.Length;
             AddToLog($"[Не найдено] Класс с текстом {findText} не найден.");
         }
-        private bool TryExtractClassToFolder(string sourceFile, string findText, string placeFolder, CancellationToken cancellationToken)
+    private bool TryExtractClassToFolder(string sourceFile, string findText, string placeFolder, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (string.IsNullOrWhiteSpace(findText))
@@ -83,13 +83,13 @@ namespace AppCleaner
             File.WriteAllText(destinationFile, resultText, encoding);
             return true;
         }
-        private static string BuildClassFileText(string usingsText, string typeText)
+    private static string BuildClassFileText(string usingsText, string typeText)
         {
             return string.IsNullOrWhiteSpace(usingsText)
                 ? $"{typeText}{Environment.NewLine}"
                 : $"{usingsText}{Environment.NewLine}{Environment.NewLine}{typeText}{Environment.NewLine}";
         }
-        private static string BuildClassFileText(string usingsText, string namespaceName, string typeText)
+    private static string BuildClassFileText(string usingsText, string namespaceName, string typeText)
         {
             var header = string.IsNullOrWhiteSpace(usingsText)
                 ? string.Empty
@@ -101,7 +101,7 @@ namespace AppCleaner
                 $"{IndentText(typeText, 4)}{Environment.NewLine}" +
                 $"}}{Environment.NewLine}";
         }
-        private void BackupExistingFile(string filePath)
+    private void BackupExistingFile(string filePath)
         {
             if (!File.Exists(filePath))
                 return;
@@ -109,8 +109,7 @@ namespace AppCleaner
             File.Copy(filePath, backupPath, overwrite: true);
             AddToLog($"[Бэкап] {backupPath}");
         }
-
-        private void BackupToDeletedStore(string sourceFilePath, string projectDirectory)
+    private void BackupToDeletedStore(string sourceFilePath, string projectDirectory)
         {
             if (string.IsNullOrWhiteSpace(sourceFilePath) || string.IsNullOrWhiteSpace(projectDirectory))
                 return;
@@ -150,7 +149,7 @@ namespace AppCleaner
             File.Copy(sourceFilePath, finalDestination, overwrite: true);
             AddToLog($"[Скопировано в GH.Meshok.Deleted] {finalDestination}");
         }
-        private static string IndentText(string text, int spaces)
+    private static string IndentText(string text, int spaces)
         {
             var indent = new string(' ', spaces);
             return string.Join(Environment.NewLine,
@@ -161,7 +160,7 @@ namespace AppCleaner
         }
         #endregion
         #region Remove non-project files
-        private void RemoveNonProjectFiles(bool dryRun, CancellationToken cancellationToken)
+    private void RemoveNonProjectFiles(bool dryRun, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var projectFile = _store.ProjectFile;
@@ -254,7 +253,7 @@ namespace AppCleaner
                 ? "[DRY-RUN] Проверка завершена."
                 : $"Удаление завершено. Удалено файлов: {deletedCount}");
         }
-        private string[] GetCandidateFiles(string directory, CancellationToken cancellationToken)
+    private string[] GetCandidateFiles(string directory, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -273,7 +272,7 @@ namespace AppCleaner
                 return Array.Empty<string>();
             }
         }
-        private HashSet<string> LoadProjectFiles(string projectFile, bool dryRun, CancellationToken cancellationToken)
+    private HashSet<string> LoadProjectFiles(string projectFile, bool dryRun, CancellationToken cancellationToken)
         {
             var result = new HashSet<string>(PathComparer);
             try
@@ -343,7 +342,7 @@ namespace AppCleaner
             return result;
         }
         // Раскрывает Include="Folder\**\*.cs" и подобные шаблоны в реальные файлы.
-        private IEnumerable<string> ExpandProjectGlob(
+    private IEnumerable<string> ExpandProjectGlob(
             string projectDirectory,
             string includePattern,
             CancellationToken cancellationToken)

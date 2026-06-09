@@ -2,8 +2,7 @@
 using System.Reflection;
 
 namespace AppCleaner;
-
-public static class PatternTypeExtensions
+    public static class PatternTypeExtensions
 {
     public static string GetDisplayName(this PatternType value)
     {
@@ -13,7 +12,6 @@ public static class PatternTypeExtensions
 
         return attr?.Name ?? value.ToString();
     }
-
     public static PatternType FromDisplayName(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))

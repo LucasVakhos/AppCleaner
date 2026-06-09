@@ -1,7 +1,6 @@
 ﻿// Classes\FileScanner.ProcessFilePathComments.cs
 namespace AppCleaner;
-
-public partial class FileScanner
+    public partial class FileScanner
 {
     private void AddFilePathCommentToCsFiles(CancellationToken cancellationToken)
     {
