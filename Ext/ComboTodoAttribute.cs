@@ -1,6 +1,5 @@
 #nullable disable
 namespace AppCleaner;
-
 public class ComboTodoAttribute : Attribute
 {
     public string Name { get; set; } = string.Empty;
@@ -9,5 +8,4 @@ public class ComboTodoAttribute : Attribute
     public string PlaceLabel { get; set; } = "Папка для найденного:";
     public OperationTypes OperationTypes { get; set; } = OperationTypes.ProcessFiles;
     public bool UseBakup { get; set; } = false;
-
 }

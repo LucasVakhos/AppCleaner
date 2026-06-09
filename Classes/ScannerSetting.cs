@@ -46,7 +46,6 @@ namespace AppCleaner;
             .OrderBy(x => x, StringComparer.OrdinalIgnoreCase)
             .ToArray();
     }
-
     private string _findText = string.Empty;
     private string _replaceText = string.Empty;
     private string _searchFolder = string.Empty;
@@ -74,7 +73,6 @@ namespace AppCleaner;
             ?? Environment.GetEnvironmentVariable("APP_MASK_TOKEN")
             ?? string.Empty;
     }
-
     public event PropertyChangedEventHandler? PropertyChanged;
     [Saved]
     public string FindText
@@ -181,7 +179,6 @@ namespace AppCleaner;
         get => _netVersion;
         set => SetField(ref _netVersion, value);
     }
-
     public bool DryRun => DryRunIndex == 0;
     public string LogText
     {
@@ -192,20 +189,17 @@ namespace AppCleaner;
                 OnPropertyChanged(nameof(SaveEnabled));
         }
     }
-
     public int TotalFiles
     {
         get => _totalFiles;
         set => SetField(ref _totalFiles, value);
     }
-
     public int TotalFolders => _totalFolders.Count;
     public int ProgressValue
     {
         get => _progressValue;
         set => SetField(ref _progressValue, Math.Min(Math.Max(0, value), ProgressMaximum));
     }
-
     public int ProgressMaximum
     {
         get => _progressMaximum;
@@ -220,19 +214,16 @@ namespace AppCleaner;
                 ProgressValue = _progressMaximum;
         }
     }
-
     public bool BeginEnabled
     {
         get => _beginEnabled;
     private set => SetField(ref _beginEnabled, value);
     }
-
     public bool CancelEnabled
     {
         get => _cancelEnabled;
     private set => SetField(ref _cancelEnabled, value);
     }
-
     public bool IsWorking
     {
         get => _isWorking;
@@ -242,7 +233,6 @@ namespace AppCleaner;
                 RefreshCommandStates();
         }
     }
-
     public bool SaveEnabled => !string.IsNullOrEmpty(LogText);
     public void SetProgressMaximum(int value)
     {
@@ -255,10 +245,14 @@ namespace AppCleaner;
     }
     public void RefreshCommandStates()
     {
-        var action = SelectedActionIndex < 0
-            ? default
-            : (ComboTodoItems)SelectedActionIndex;
-        BeginEnabled = !IsWorking && action switch
+        var action = Enum.IsDefined(typeof(ComboTodoItems), SelectedActionIndex)
+            ? (ComboTodoItems)SelectedActionIndex
+            : ComboTodoItems.DeleteEmpty;
+        bool useBackup = action.GetAttribute<ComboTodoAttribute>()?.UseBakup == true;
+        bool backupReady =
+            !useBackup ||
+            !string.IsNullOrWhiteSpace(BakFolder);
+        bool actionReady = action switch
         {
             ComboTodoItems.DeleteNonProjectFiles =>
                 !string.IsNullOrWhiteSpace(ProjectFile),
@@ -276,6 +270,7 @@ namespace AppCleaner;
             _ =>
                 !string.IsNullOrWhiteSpace(SearchFolder)
         };
+        BeginEnabled = !IsWorking && actionReady && backupReady;
         CancelEnabled = IsWorking;
     }
     public void SaveToIni()
@@ -385,7 +380,6 @@ namespace AppCleaner;
         AddPathes(searchValue);
         AddPathes(placeValue);
     }
-
     private bool SetField<T>(
         ref T field,
         T value,

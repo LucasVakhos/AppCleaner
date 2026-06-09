@@ -1,7 +1,6 @@
 //ComboTodoItems
 #nullable disable
 namespace AppCleaner;
-
 public enum ComboTodoItems
 {
     [ComboTodo(

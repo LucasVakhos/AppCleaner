@@ -127,39 +127,29 @@ namespace AppCleaner;
     private void InitializeComboBoxes()
     {
         RefreshPathComboBoxes();
-
         cboSearchPatterns.Properties.Items.Clear();
         cboSearchPatterns.Properties.Items.AddRange(
             Enum.GetValues<PatternType>()
                 .Select(x => x.GetDisplayName())
                 .ToArray());
-
         SetSelectedPatternFromStore();
-
         cboSelectToDo.Properties.Items.Clear();
         _todoItems.Clear();
-
         foreach (ComboTodoItems item in Enum.GetValues<ComboTodoItems>())
         {
             _todoItems.Add(item);
-
             var attr = item.GetAttribute<ComboTodoAttribute>();
-
             cboSelectToDo.Properties.Items.Add(
                 attr?.Name ?? item.ToString());
         }
-
         SetSelectedTodoFromStore();
-
         cboNET.Properties.Items.Clear();
         _netItems.Clear();
-
         foreach (ComboNetItems item in Enum.GetValues<ComboNetItems>())
         {
             _netItems.Add(item);
             cboNET.Properties.Items.Add(GetDisplayName(item));
         }
-
         SetSelectedNetFromStore();
     }
     private void SetSelectedPatternFromStore()
@@ -221,18 +211,13 @@ namespace AppCleaner;
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(x => x)
             .ToList();
-
         var pathes = _store.Pathes.ToArray();
-
         cboSearchFolder.Properties.Items.Clear();
         cboSearchFolder.Properties.Items.AddRange(pathes);
-
         cboPlaceFolder.Properties.Items.Clear();
         cboPlaceFolder.Properties.Items.AddRange(pathes);
-
         cboBakFolder.Properties.Items.Clear();
         cboBakFolder.Properties.Items.AddRange(pathes);
-
         cboBakFolder.EditValue = _store.BakFolder;
     }
     private static bool IsValidPath(string path)
@@ -304,7 +289,6 @@ namespace AppCleaner;
         _operationCts?.Cancel();
         _store.RefreshCommandStates();
     }
-
     private CancellationToken CurrentToken => _operationCts?.Token ?? CancellationToken.None;
     private void BeginOperation()
     {
@@ -421,22 +405,17 @@ namespace AppCleaner;
     {
         if (cboSelectToDo.SelectedIndex < 0 || cboSelectToDo.SelectedIndex >= _todoItems.Count)
             return;
-
         _store.SelectedActionIndex = cboSelectToDo.SelectedIndex;
         _todoType = GetTodoBySelectedIndex();
-
         var attr = _todoType.GetAttribute<ComboTodoAttribute>();
-
         if (attr != null)
         {
             _store.SearchPattern = attr.Pattern;
             SetSelectedPatternFromStore();
         }
-
         UpdatePathFilters(_todoType);
         SetupLayouts();
         SyncPathEditorFromStore();
-
         _store.RefreshCommandStates();
         RefreshUi();
     }
@@ -462,12 +441,18 @@ namespace AppCleaner;
     }
     private void cboSearchFolder_EditValueChanged(object sender, EventArgs e)
     {
+        if (_suppressFolderEditValueChanged)
+            return;
+        UpdatePathsFromEditor();
         _store.SetSearchValue(_todoType, cboSearchFolder.Text);
         _store.AddPathes(cboSearchFolder.Text);
         _store.RefreshCommandStates();
     }
     private void cboPlaceFolder_EditValueChanged(object sender, EventArgs e)
     {
+        if (_suppressFolderEditValueChanged)
+            return;
+        UpdatePathsFromEditor();
         _store.SetPlaceValue(_todoType, cboPlaceFolder.Text);
         _store.AddPathes(cboPlaceFolder.Text);
         _store.RefreshCommandStates();
@@ -574,8 +559,10 @@ namespace AppCleaner;
                 _store.ProjectFile = searchValue;
                 break;
             case ComboTodoItems.SyncProjectFileWithSample:
+            case ComboTodoItems.RestoreMissingUsings:
             case ComboTodoItems.ConvertOldCsprojToSdkStyle:
                 _store.ProjectFile = searchValue;
+                _store.SampleProjectFile = placeValue;
                 break;
             case ComboTodoItems.FindValueOrClassAddScaveToProject:
                 _store.SearchFolder = searchValue;
@@ -590,38 +577,30 @@ namespace AppCleaner;
     private void SetupLayouts()
     {
         var attr = TodoType.GetAttribute<ComboTodoAttribute>();
-
         bool isProcessFiles = attr?.OperationTypes == OperationTypes.ProcessFiles;
         bool useBackup = attr?.UseBakup == true;
-
         bool isFindReplace = TodoType == ComboTodoItems.FindAndReplace;
         bool isFindAdd = TodoType == ComboTodoItems.FindValueOrClassAddScaveToProject;
         bool isSync = TodoType is ComboTodoItems.SyncProjectFileWithSample or ComboTodoItems.RestoreMissingUsings;
         bool isConvert = TodoType == ComboTodoItems.ConvertOldCsprojToSdkStyle;
         bool isProjectMode = isFindAdd || isSync || isConvert;
-
         SetVisibility(lgFolders, isProcessFiles);
         SetVisibility(lcPlaceFolder, isFindAdd || isSync);
         SetVisibility(lcBakFolder, useBackup);
-
         SetVisibility(lgOptions, TodoType is ComboTodoItems.ClearNameSpace or ComboTodoItems.DeleteNonProjectFiles);
-
         lcSearchFolder.Text = attr?.SearchLabel ?? "Cканировать папку:";
         lcPlaceFolder.Text = attr?.PlaceLabel ?? "Папка для найденного:";
-
         SetVisibility(lcNetVersion, isConvert);
         SetVisibility(emptySearchExt, !isProjectMode);
         SetVisibility(lcSearchMask, !isProjectMode);
         SetVisibility(lcDRY_RUN, TodoType is ComboTodoItems.ClearNameSpace or ComboTodoItems.DeleteNonProjectFiles);
         SetVisibility(lcFind, isFindReplace || isFindAdd);
         SetVisibility(lcReplace, isFindReplace);
-
         cboSearchFolder.Properties.NullValuePrompt = isConvert
             ? "Установите старый файл проекта..."
             : isProjectMode
                 ? "Установите файл проекта для сравнения..."
                 : "Установите папку для сканирования...";
-
         cboPlaceFolder.Properties.NullValuePrompt = isConvert
             ? "Установите путь нового SDK-style проекта..."
             : isSync
@@ -708,25 +687,18 @@ namespace AppCleaner;
     }
     private void btnSave_Click(object sender, EventArgs e)
     {
-        using SaveFileDialog dlg = new()
-        {
-            InitialDirectory = openFolderDlg.InitialDirectory,
-            Title = "Сохранить лог",
-            FileName = GetLogFileName(),
-            Filter = "Log files (*.log)|*.log",
-            DefaultExt = "log",
-            AddExtension = true
-        };
-        if (dlg.ShowDialog() != DialogResult.OK)
-            return;
+        string fileName = Path.Combine(
+            GetLogFolder(),
+            GetLogFileName());
         File.WriteAllText(
-            dlg.FileName,
+            fileName,
             logMemo.Text,
             Encoding.UTF8);
+        AddToLog($"[Лог сохранён] {fileName}");
         Process.Start(new ProcessStartInfo
         {
             FileName = "devenv.exe",
-            Arguments = $"/edit \"{dlg.FileName}\"",
+            Arguments = $"/edit \"{fileName}\"",
             UseShellExecute = true
         });
     }

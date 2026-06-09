@@ -98,7 +98,6 @@ namespace AppCleaner
                 ? "Namespace не найдены."
                 : string.Join(Environment.NewLine, namespaces.Select(x => $"{x.Key} : {x.Value}")));
         }
-
     private static class NamespaceNormalizer
         {
     public static string NormalizeSameNamespacePrefixes(string source, out bool changed)
@@ -139,7 +138,6 @@ namespace AppCleaner
                     .OrderBy(x => x, StringComparer.Ordinal)
                     .ToArray();
             }
-
     private sealed class SameNamespacePrefixRewriter : CSharpSyntaxRewriter
             {
                 private readonly IReadOnlyList<string> _namespaces;
@@ -147,7 +145,6 @@ namespace AppCleaner
                 {
                     _namespaces = namespaces;
                 }
-
     public bool Changed { get;
     private set; }
     public override SyntaxNode? VisitUsingDirective(UsingDirectiveSyntax node) => node;

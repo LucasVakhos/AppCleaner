@@ -4,7 +4,6 @@ using System.Text;
 using System.Xml.Linq;
 using SysAttr = System.Attribute;
 namespace AppCleaner;
-
 public partial class FileScanner
 {
     #region Validation
@@ -489,7 +488,6 @@ public partial class FileScanner
             .Where(x => IsConcreteCsFile(x.Path))
             .Select(x => (x.Path!, x.Element));
     }
-
     private static IEnumerable<(string Path, XElement Element)> GetCompileItems(XDocument doc, XNamespace ns)
     {
         return doc
@@ -633,43 +631,34 @@ public partial class FileScanner
     {
         if (!ShouldCreateBackup())
             return;
-
         if (string.IsNullOrWhiteSpace(filePath))
         {
             AddToLog("[Ошибка бэкапа] путь к файлу пустой.");
             return;
         }
-
         if (!File.Exists(filePath))
         {
             AddToLog($"[Ошибка бэкапа] файл не найден: {filePath}");
             return;
         }
-
         try
         {
-            var backupFolder = _store.BakFolder;
-
+            var backupFolder = GetBackupFolder();
             if (string.IsNullOrWhiteSpace(backupFolder))
             {
                 AddToLog("[Ошибка бэкапа] не указана папка для бэкапов.");
                 return;
             }
-
             Directory.CreateDirectory(backupFolder);
-
             var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var fileName = Path.GetFileName(filePath);
             var backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.bak");
-
             for (int i = 1; File.Exists(backupFilePath); i++)
             {
                 backupFilePath = Path.Combine(backupFolder, $"{fileName}.{timestamp}.{i}.bak");
             }
-
             File.Copy(filePath, backupFilePath, overwrite: false);
             CopyFileTimestamps(filePath, backupFilePath);
-
             AddToLog($"[Бэкап создан] {backupFilePath}");
         }
         catch (Exception ex)
@@ -687,6 +676,47 @@ public partial class FileScanner
         catch
         {
         }
+    }
+    private string GetOperationFolder()
+    {
+        string rootFolder = _store.BakFolder;
+        if (string.IsNullOrWhiteSpace(rootFolder))
+            rootFolder = Application.StartupPath;
+        var attr = TodoType.GetAttribute<ComboTodoAttribute>();
+        string folderName =
+            attr?.Name ??
+            TodoType.ToString();
+        foreach (char c in Path.GetInvalidFileNameChars())
+            folderName = folderName.Replace(c.ToString(), "");
+        string operationFolder = Path.Combine(
+            rootFolder,
+            folderName);
+        Directory.CreateDirectory(operationFolder);
+        return operationFolder;
+    }
+    private string GetBackupFolder()
+    {
+        string folder = Path.Combine(
+            GetOperationFolder(),
+            "Backup");
+        Directory.CreateDirectory(folder);
+        return folder;
+    }
+    private string GetLogFolder()
+    {
+        string folder = Path.Combine(
+            GetOperationFolder(),
+            "Logs");
+        Directory.CreateDirectory(folder);
+        return folder;
+    }
+    private string GetReportFolder()
+    {
+        string folder = Path.Combine(
+            GetOperationFolder(),
+            "Reports");
+        Directory.CreateDirectory(folder);
+        return folder;
     }
     #endregion
 }
